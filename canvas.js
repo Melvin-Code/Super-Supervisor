@@ -31,6 +31,7 @@ var currentFrame = 1; // gives a number tu the first frame in the spritesheet so
 
 
 function updateFrame() { // updates the frame and clears the previous ones from the canvas once a new one has taken its place
+  ctx.clearRect(x, y, width, height);
   currentFrame = (currentFrame + 1) % cols;
 
   document.onkeydown = function (e) { //changes the animation by the input of a key on the keyboard
@@ -38,10 +39,12 @@ function updateFrame() { // updates the frame and clears the previous ones from 
 
       case 37:
         left = true;
+         x -= 2
         console.log('left', );
         break;
       case 39:
         left = false;
+        x += 2
         console.log('right');
         break;
 
@@ -54,7 +57,7 @@ function updateFrame() { // updates the frame and clears the previous ones from 
   } else {
     srcY = trackRight * height
   }
-  ctx.clearRect(x, y, width, height);
+  
 }
 
 
