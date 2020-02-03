@@ -19,6 +19,8 @@ let srcY; // change wich animation from the sprite sheet is run
 steve = {
 
   jumping:true,
+  running: true,
+  punching: true,
   height:sheetHeight / rows,
   width:sheetWidth / 13,
   x: canvas.width / 2, // center of the canvas
@@ -36,33 +38,6 @@ let character = new Image(); // chose the spritesheet image that will be use
 character.src = 'images/Player.png';
 
 
-//movement
-let rightPressed, leftPressed, spacePressed;
-
-function keyDownHandler(event){
-  if(event.keyCode === 39 || event.keyCode === 68){
-      rightPressed = true;
-  }
-  else if(event.keyCode === 37 || event.keyCode === 65){
-      leftPressed = true;
-  }
-}
-
-function keyUpHandler(event){
-  if(event.keyCode === 39 || event.keyCode === 68){
-      rightPressed = false;
-  }
-  else if(event.keyCode === 37 || event.keyCode === 65){
-      leftPressed = false;
-  } else if(event.keyCode === 32){
-      jumping = false;
-      steve.y = canvas.height - steve.height;
-  }
-}
-
-
-document.addEventListener('keydown', keyDownHandler, false);
-document.addEventListener('keyup', keyUpHandler, false);
 
 
 function updateFrame() { // updates the frame and clears the previous ones from the canvas once a new one has taken its place
@@ -85,21 +60,6 @@ setInterval(function () { // sets the interval between frames
   c.clearRect(0,0,canvas.width, canvas.height);
   
   drawImage();
-  // if(rightPressed){
-  //   srcY = steve.height * 11;
-  //   drawImage();
-  //   steve.x += steve.x_velocity;
-  // }
-  // else if(leftPressed){
-  //   srcY = steve.height * 9;
-  //   drawImage();
-  //   steve.x -= steve.x_velocity;
-  // }
-
-  // if(steve.y + steve.height > canvas.height){
-  //   steve.y_velocity = -steve.y_velocity * friction;
-  // } else { steve.y_velocity += 10;}
-  
     
 }, 100);
 
@@ -110,7 +70,9 @@ controller = {
 
   left:false,
   right:false,
-  up:false,
+  space:false,
+  shift: false,
+  m: false,
   keyListener:function(event) {
 
     var key_state = (event.type == "keydown")?true:false;
@@ -120,8 +82,8 @@ controller = {
       case 37:// left key
         controller.left = key_state;
       break;
-      case 38:// up key
-        controller.up = key_state;
+      case 32:// space key
+        controller.space = key_state;
       break;
       case 39:// right key
         controller.right = key_state;
@@ -135,7 +97,8 @@ controller = {
 
 loop = function() {
 
-  if (controller.up && steve.jumping == false) {
+
+  if (controller.space && steve.jumping == false) {
 
     steve.y_velocity -= 20;
     steve.jumping = true;
@@ -143,18 +106,20 @@ loop = function() {
   }
 
   if (controller.left) {
+ 
     srcY = steve.height * 9;
     steve.x_velocity -= 0.5;
 
   }
 
   if (controller.right) {
+   
     srcY = steve.height * 11;
     steve.x_velocity += 0.5;
 
   }
 
-  steve.y_velocity += 1.5;// gravity
+  steve.y_velocity += 2;// gravity
   steve.x += steve.x_velocity;
   steve.y += steve.y_velocity;
   steve.x_velocity *= 0.9;// friction
