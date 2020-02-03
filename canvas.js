@@ -23,13 +23,17 @@ steve = {
   punching: true,
   height:sheetHeight / rows,
   width:sheetWidth / 13,
-  x: canvas.width / 2, // center of the canvas
-  x_velocity:10,
+  x: (canvas.width / 2) - (sheetWidth / 8), // center of the canvas
+  x_velocity:2,
   y:canvas.height - sheetHeight / rows,
   y_velocity:4,
   currentFrame: 1 // gives a number tu the first frame in the spritesheet so it can track the frame change
 
 };
+
+/////////////////////////////////////////////////////////////////////////////////////
+//MAKE A CLASS FOR ENEMIES
+//ADD HEALTH
 
 let gravity = 1;
 let friction = 0.95;
@@ -122,25 +126,25 @@ loop = function() {
 
   if(controller.shiftKey && controller.right){
     srcY = steve.height * 11;
-    steve.x_velocity += 1;
+    steve.x_velocity += 0.4;
   }
 
   if(controller.shiftKey && controller.left){
     srcY = steve.height * 9;
-    steve.x_velocity -= 1;
+    steve.x_velocity -= 0.4;
   }
 
   if (controller.left) {
  
     srcY = steve.height * 9;
-    steve.x_velocity -= 0.5;
+    steve.x_velocity -= 0.3;
 
   }
 
   if (controller.right) {
    
     srcY = steve.height * 11;
-    steve.x_velocity += 0.5;
+    steve.x_velocity += 0.3;
 
   }
 
@@ -178,6 +182,11 @@ loop = function() {
   window.requestAnimationFrame(loop);
 
 };
+
+////////////////////////////////////////////////////////////////////////////////////////
+//CREATE OBSTACLE HERE
+
+
 
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
