@@ -175,15 +175,19 @@ function updateFrame() { // updates the frame and clears the previous ones from 
   steve.currentFrame = (steve.currentFrame + 1) % cols;
   
   if (!controller.m){
-  srcX = steve.currentFrame * steve.width;
+    
+    srcX = steve.currentFrame * steve.width;
+    cols = 7;
+    
   } 
   
   if (controller.m) {
-    if (steve.currentFrame !== 6 ){
-      steve.currentFrame += 20;
+    if (steve.currentFrame == 2 || steve.currentFrame > 2 && steve.currentFrame < 11){
+      steve.currentFrame = 11;
     }
-    cols = 7;
-    steve.currentFrame = (steve.currentFrame + 1) % 13;
+    
+    cols = 13;
+
     srcX = steve.currentFrame * 64;
   }
   
