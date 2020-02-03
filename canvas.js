@@ -83,7 +83,7 @@ function drawImage() { //draws every frame into te board
 setInterval(function () { // sets the interval between frames
   
   c.clearRect(0,0,canvas.width, canvas.height);
-  ;
+  
   drawImage();
   // if(rightPressed){
   //   srcY = steve.height * 11;
@@ -170,13 +170,13 @@ loop = function() {
   }
 
   // if steve is going off the left of the screen
-  if (steve.x < -32) {
+  if (steve.x < 0 - steve.width) {
 
     steve.x = canvas.width;
 
   } else if (steve.x > canvas.width) {// if steve goes past right boundary
 
-    steve.x = -32;
+    steve.x =  0 - steve.width;
 
   }
 
