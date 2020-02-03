@@ -6,7 +6,7 @@ canvas.width = window.innerWidth  - 40;
 
 let c = canvas.getContext('2d'); //gets the context in 2d
 
-const sheetWidth = 832; //width of spriteSheet
+let sheetWidth = 832; //width of spriteSheet
 const sheetHeight = 1344; // heigth of spriteSheet
 
 let cols = 7; // number of frames or images are in one animation
@@ -37,31 +37,6 @@ let friction = 0.95;
 let character = new Image(); // chose the spritesheet image that will be use
 character.src = 'images/Player.png';
 
-
-
-
-function updateFrame() { // updates the frame and clears the previous ones from the canvas once a new one has taken its place
-  c.clearRect(steve.x, steve.y, steve.width, steve.height);
-  steve.currentFrame = (steve.currentFrame + 1) % cols;
-
-  srcX = steve.currentFrame * steve.width;
-  
-}
-
-
-function drawImage() { //draws every frame into te board
-  updateFrame();
-  c.drawImage(character, srcX, srcY, steve.width, steve.height, steve.x, steve.y -100, steve.width + 100, steve.height + 100);
-
-}
-
-setInterval(function () { // sets the interval between frames
-  
-  c.clearRect(0,0,canvas.width, canvas.height);
-  
-  drawImage();
-    
-}, 100);
 
 
 
@@ -145,8 +120,16 @@ loop = function() {
   }
 
   if (controller.m) {
+    
+    // function updatePunch() { // updates the frame and clears the previous ones from the canvas once a new one has taken its place
+    //   c.clearRect(steve.x, steve.y, steve.width, steve.height);
+    //   steve.currentFrame = (steve.currentFrame + 3) % cols;
+    // let cols = 13
+    // srcX = 64 * 6
+
+
     srcY = steve.height * 19;
-  }
+    }
 
   steve.y_velocity += 2;// gravity
   steve.x += steve.x_velocity;
@@ -178,6 +161,42 @@ loop = function() {
   window.requestAnimationFrame(loop);
 
 };
+
+function updateFrame() { // updates the frame and clears the previous ones from the canvas once a new one has taken its place
+  c.clearRect(steve.x, steve.y, steve.width, steve.height);
+  steve.currentFrame = (steve.currentFrame + 1) % cols;
+  
+  if (!controller.m){
+  srcX = steve.currentFrame * steve.width;
+  } 
+  
+  if (controller.m) {
+    if (steve.currentFrame !== 6 ){
+      steve.currentFrame += 20
+    }
+    cols = 7
+    steve.currentFrame = (steve.currentFrame + 1) % 13;
+    srcX = steve.currentFrame * 64
+  }
+  console.log(steve.currentFrame)
+  console.log(srcX)
+  
+}
+
+
+function drawImage() { //draws every frame into te board
+  updateFrame();
+  c.drawImage(character, srcX, srcY, steve.width, steve.height, steve.x, steve.y -100, steve.width + 100, steve.height + 100);
+
+}
+
+setInterval(function () { // sets the interval between frames
+  
+  c.clearRect(0,0,canvas.width, canvas.height);
+  
+  drawImage();
+    
+}, 100);
 
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
