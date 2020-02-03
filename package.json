@@ -5,6 +5,7 @@
   "main": "canvas.js",
   "dependencies": {},
   "devDependencies": {
+    "babel": "^6.23.0",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.10.2"

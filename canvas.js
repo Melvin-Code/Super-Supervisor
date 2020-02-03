@@ -1,25 +1,10 @@
 /* jshint esversion: 9 */
 
 const canvas = document.querySelector('canvas');
-canvas.height = window.innerHeight - 600;
-canvas.width = window.innerWidth - 40;
+canvas.height = 600;
+canvas.width = window.innerWidth  - 40;
 
-ctx = canvas.getContext('2d'); //gets the context in 2d
-
-
-
-
-let x = canvas.width / 2; //horizontal position of the player
-let y = 0; //vertical position of the player
-
-let dx = 5; //horizontal velocity of the player
-let dy = 0; //vertical velocity of the player
-let gravity = 1;
-let friction = 0.95;
-
-
-let srcX; // runs vertically trough the sprite sheet creatin the motion 
-let srcY; // change wich animation from the sprite sheet is run
+let c = canvas.getContext('2d'); //gets the context in 2d
 
 const sheetWidth = 832; //width of spriteSheet
 const sheetHeight = 1344; // heigth of spriteSheet
@@ -27,13 +12,28 @@ const sheetHeight = 1344; // heigth of spriteSheet
 let cols = 7; // number of frames or images are in one animation
 let rows = 21; // number of animations
 
-let width = sheetWidth / 13; // width from the spritesheet that is shown
-let height = sheetHeight / rows; // heigth of the spritesheet that is shown
-y = canvas.height - height;
+let srcX; // runs vertically trough the sprite sheet creatin the motion 
+let srcY; // change wich animation from the sprite sheet is run
+
+
+steve = {
+
+  jumping:true,
+  height:sheetHeight / rows,
+  width:sheetWidth / 13,
+  x: canvas.width / 2, // center of the canvas
+  x_velocity:10,
+  y:canvas.height - sheetHeight / rows,
+  y_velocity:4,
+  currentFrame: 1 // gives a number tu the first frame in the spritesheet so it can track the frame change
+
+};
+
+let gravity = 1;
+let friction = 0.95;
+
 let character = new Image(); // chose the spritesheet image that will be use
 character.src = 'images/Player.png';
-
-let currentFrame = 1; // gives a number tu the first frame in the spritesheet so it can track the frame change
 
 
 //movement
@@ -45,11 +45,6 @@ function keyDownHandler(event){
   }
   else if(event.keyCode === 37 || event.keyCode === 65){
       leftPressed = true;
-  } else if(event.keyCode === 32){
-
-    if(y > (canvas.height - 80)){
-      y -= 20;
-    }
   }
 }
 
@@ -60,7 +55,8 @@ function keyUpHandler(event){
   else if(event.keyCode === 37 || event.keyCode === 65){
       leftPressed = false;
   } else if(event.keyCode === 32){
-      y = canvas.height - height;
+      jumping = false;
+      steve.y = canvas.height - steve.height;
   }
 }
 
@@ -70,38 +66,125 @@ document.addEventListener('keyup', keyUpHandler, false);
 
 
 function updateFrame() { // updates the frame and clears the previous ones from the canvas once a new one has taken its place
-  ctx.clearRect(x, y, width, height);
-  currentFrame = (currentFrame + 1) % cols;
+  c.clearRect(steve.x, steve.y, steve.width, steve.height);
+  steve.currentFrame = (steve.currentFrame + 1) % cols;
 
-  srcX = currentFrame * width;
+  srcX = steve.currentFrame * steve.width;
   
 }
 
 
 function drawImage() { //draws every frame into te board
   updateFrame();
-  ctx.drawImage(character, srcX, srcY, width, height, x, y, width, height);
+  c.drawImage(character, srcX, srcY, steve.width, steve.height, steve.x, steve.y -100, steve.width + 100, steve.height + 100);
 
 }
 
 setInterval(function () { // sets the interval between frames
   
-  ctx.clearRect(0,0,canvas.width, canvas.height);
+  c.clearRect(0,0,canvas.width, canvas.height);
+  ;
   drawImage();
-  if(rightPressed){
-    srcY = height * 11;
-    drawImage();
-    x += dx;
-  }
-  else if(leftPressed){
-    srcY = height * 9;
-    drawImage();
-    x -= dx;
-  }
+  // if(rightPressed){
+  //   srcY = steve.height * 11;
+  //   drawImage();
+  //   steve.x += steve.x_velocity;
+  // }
+  // else if(leftPressed){
+  //   srcY = steve.height * 9;
+  //   drawImage();
+  //   steve.x -= steve.x_velocity;
+  // }
 
-  if(y + height > canvas.height){
-    dy = -dy * friction;
-  } else { dy += 10;}
+  // if(steve.y + steve.height > canvas.height){
+  //   steve.y_velocity = -steve.y_velocity * friction;
+  // } else { steve.y_velocity += 10;}
   
     
 }, 100);
+
+
+
+
+controller = {
+
+  left:false,
+  right:false,
+  up:false,
+  keyListener:function(event) {
+
+    var key_state = (event.type == "keydown")?true:false;
+
+    switch(event.keyCode) {
+
+      case 37:// left key
+        controller.left = key_state;
+      break;
+      case 38:// up key
+        controller.up = key_state;
+      break;
+      case 39:// right key
+        controller.right = key_state;
+      break;
+
+    }
+
+  }
+
+};
+
+loop = function() {
+
+  if (controller.up && steve.jumping == false) {
+
+    steve.y_velocity -= 20;
+    steve.jumping = true;
+
+  }
+
+  if (controller.left) {
+    srcY = steve.height * 9;
+    steve.x_velocity -= 0.5;
+
+  }
+
+  if (controller.right) {
+    srcY = steve.height * 11;
+    steve.x_velocity += 0.5;
+
+  }
+
+  steve.y_velocity += 1.5;// gravity
+  steve.x += steve.x_velocity;
+  steve.y += steve.y_velocity;
+  steve.x_velocity *= 0.9;// friction
+  steve.y_velocity *= 0.9;// friction
+
+  // if steve is falling below floor line
+  if (steve.y > canvas.height - steve.height) {
+
+    steve.jumping = false;
+    steve.y = canvas.height - sheetHeight / rows;
+    steve.y_velocity = 0;
+
+  }
+
+  // if steve is going off the left of the screen
+  if (steve.x < -32) {
+
+    steve.x = canvas.width;
+
+  } else if (steve.x > canvas.width) {// if steve goes past right boundary
+
+    steve.x = -32;
+
+  }
+
+  // call update when the browser is ready to draw again
+  window.requestAnimationFrame(loop);
+
+};
+
+window.addEventListener("keydown", controller.keyListener);
+window.addEventListener("keyup", controller.keyListener);
+window.requestAnimationFrame(loop);
