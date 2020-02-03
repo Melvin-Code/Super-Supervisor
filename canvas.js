@@ -71,7 +71,7 @@ controller = {
   left:false,
   right:false,
   space:false,
-  shift: false,
+  shiftKey: false,
   m: false,
   keyListener:function(event) {
 
@@ -88,6 +88,12 @@ controller = {
       case 39:// right key
         controller.right = key_state;
       break;
+      case 77:// m key
+        controller.m = key_state;
+      break;
+      case 16:// shift key
+        controller.shiftKey = key_state;
+      break;
 
     }
 
@@ -100,9 +106,19 @@ loop = function() {
 
   if (controller.space && steve.jumping == false) {
 
-    steve.y_velocity -= 20;
+    steve.y_velocity -= 30;
     steve.jumping = true;
 
+  }
+
+  if(controller.shiftKey && controller.right){
+    srcY = steve.height * 11;
+    steve.x_velocity += 1;
+  }
+
+  if(controller.shiftKey && controller.left){
+    srcY = steve.height * 9;
+    steve.x_velocity -= 1;
   }
 
   if (controller.left) {
