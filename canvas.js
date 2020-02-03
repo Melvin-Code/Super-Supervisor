@@ -79,11 +79,17 @@ controller = {
 
     switch(event.keyCode) {
 
+      case 65:// A
+        controller.left = key_state;
+      break;
       case 37:// left key
         controller.left = key_state;
       break;
       case 32:// space key
         controller.space = key_state;
+      break;
+      case 68:// D
+        controller.right = key_state;
       break;
       case 39:// right key
         controller.right = key_state;
@@ -103,6 +109,9 @@ controller = {
 
 loop = function() {
 
+  if (!controller.space && !controller.right && !controller.left && !controller.m && !controller.shiftKey){
+    srcY = steve.height * 10;
+  }
 
   if (controller.space && steve.jumping == false) {
 
@@ -133,6 +142,10 @@ loop = function() {
     srcY = steve.height * 11;
     steve.x_velocity += 0.5;
 
+  }
+
+  if (controller.m) {
+    srcY = steve.height * 19;
   }
 
   steve.y_velocity += 2;// gravity
