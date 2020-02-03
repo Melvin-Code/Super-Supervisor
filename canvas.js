@@ -31,6 +31,9 @@ steve = {
 
 };
 
+let cabinet = new Image();
+cabinet.src = 'images/Assets/output-onlinepngtools.png'
+
 let gravity = 1;
 let friction = 0.95;
 
@@ -183,7 +186,9 @@ function updateFrame() { // updates the frame and clears the previous ones from 
   
 }
 
-
+function drawObject()  {
+  c.drawImage(cabinet, canvas.width / 2, canvas.height - 100, 200, 100)
+}
 function drawImage() { //draws every frame into te board
   updateFrame();
   c.drawImage(character, srcX, srcY, steve.width, steve.height, steve.x, steve.y -100, steve.width + 100, steve.height + 100);
@@ -195,8 +200,10 @@ setInterval(function () { // sets the interval between frames
   c.clearRect(0,0,canvas.width, canvas.height);
   
   drawImage();
-    
+  drawObject()  
 }, 100);
+
+
 
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
