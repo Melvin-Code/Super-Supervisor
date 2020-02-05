@@ -2,7 +2,7 @@
 var config = {
     type: Phaser.AUTO,
     width: 800,
-    height: 600,
+    height: 550,
     physics: {
         default: 'arcade',
         arcade: {
@@ -25,7 +25,7 @@ var map;
 var player;
 var cursors;
 var enemies;
-var groundLayer, coinLayer;
+var office, coinLayer;
 var text;
 var score = 0;
 let enemyCount = 0;
@@ -33,11 +33,11 @@ var health = 100;
 
 function preload() {
     // map made with Tiled in JSON format
-    this.load.tilemapTiledJSON('map', 'assets/map.json');
+    this.load.tilemapTiledJSON('map', 'assets/officeMap.json');
     // tiles in spritesheet 
     this.load.spritesheet('tiles', 'assets/tiles.png', {frameWidth: 70, frameHeight: 70});
     // simple coin image
-    this.load.image('coin', 'assets/coinGold.png');
+    this.load.image('terrainPNG', 'assets/Office_furniture_set.png');
     // player animations
     this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
     this.load.image('enemy', 'assets/enemy.png');
@@ -50,20 +50,22 @@ function create() {
     map = this.make.tilemap({key: 'map'});
 
     // tiles for the ground layer
-    var groundTiles = map.addTilesetImage('tiles');
+    var office = map.addTilesetImage('test','terrainPNG');
+         map.createDynamicLayer('default2', office, 0, 0).setScale(2.3);
+            map.createStaticLayer('default', office, 0, 0).setScale(2.3);
     // create the ground layer
-    groundLayer = map.createDynamicLayer('World', groundTiles, 0, 0);
+    // groundLayer = map.createDynamicLayer('World', groundTiles, 0, 0);
     // the player will collide with this layer
-    groundLayer.setCollisionByExclusion([-1]);
+    map.setCollisionByExclusion([-1]);
 
     // coin image used as tileset
-    var coinTiles = map.addTilesetImage('coin');
+    // var coinTiles = map.addTilesetImage('coin');
     // add coins as tiles
-    coinLayer = map.createDynamicLayer('Coins', coinTiles, 0, 0);
+    // coinLayer = map.createDynamicLayer('Coins', coinTiles, 0, 0);
 
     // set the boundaries of our game world
-    this.physics.world.bounds.width = groundLayer.width;
-    this.physics.world.bounds.height = groundLayer.height;
+    this.physics.world.bounds.width = office.width;
+    this.physics.world.bounds.height = 475 ;
 
     // create the player sprite    
     player = this.physics.add.sprite(200, 200, 'player').setScale(1.5);
@@ -74,17 +76,17 @@ function create() {
     player.body.setSize(player.width - 64, player.height - 40);
     
     // player will collide with the level tiles 
-    this.physics.add.collider(groundLayer, player);
+    this.physics.add.collider(map, player);
 
-    coinLayer.setTileIndexCallback(17, collectCoin, this);
+    // coinLayer.setTileIndexCallback(17, collectCoin, this);
     // when the player overlaps with a tile with index 17, collectCoin 
     // will be called    
-    this.physics.add.overlap(player, coinLayer);
+    // this.physics.add.overlap(player, coinLayer);
 
 
     //enemies
     enemies = this.physics.add.group();
-    this.physics.add.collider(groundLayer, enemies);
+    // this.physics.add.collider(groundLayer, enemies);
 
     // player walk animation
     this.anims.create({
@@ -114,7 +116,7 @@ function create() {
     this.cameras.main.startFollow(player);
 
     // set background color, so the sky is not black    
-    this.cameras.main.setBackgroundColor('#ccccff');
+    // this.cameras.main.setBackgroundColor('#ccccff');
 
     // this text will show the score
     text = this.add.text(20, 570, '0', {
