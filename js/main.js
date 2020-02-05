@@ -1,3 +1,4 @@
+/* jshint esversion:9 */
 var config = {
     type: Phaser.AUTO,
     width: 800,
@@ -9,6 +10,7 @@ var config = {
             debug: false
         }
     },
+    
     scene: {
         key: 'main',
         preload: preload,
@@ -22,9 +24,12 @@ var game = new Phaser.Game(config);
 var map;
 var player;
 var cursors;
+var enemies;
 var groundLayer, coinLayer;
 var text;
 var score = 0;
+let enemyCount = 0;
+var health = 100;
 
 function preload() {
     // map made with Tiled in JSON format
@@ -35,7 +40,10 @@ function preload() {
     this.load.image('coin', 'assets/coinGold.png');
     // player animations
     this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
+    this.load.image('enemy', 'assets/enemy.png');
+    this.load.image('shot', 'assets/bullet.png');
 }
+
 
 function create() {
     // load the map 
@@ -63,7 +71,7 @@ function create() {
     player.setCollideWorldBounds(true); // don't go out of the map    
     
     // small fix to our player images, we resize the physics body object slightly
-    player.body.setSize(player.width - 8, player.height - 40);
+    player.body.setSize(player.width - 64, player.height - 40);
     
     // player will collide with the level tiles 
     this.physics.add.collider(groundLayer, player);
@@ -72,6 +80,11 @@ function create() {
     // when the player overlaps with a tile with index 17, collectCoin 
     // will be called    
     this.physics.add.overlap(player, coinLayer);
+
+
+    //enemies
+    enemies = this.physics.add.group();
+    this.physics.add.collider(groundLayer, enemies);
 
     // player walk animation
     this.anims.create({
@@ -110,7 +123,101 @@ function create() {
     });
     // fix the text to the camera
     text.setScrollFactor(0);
+
+    healthBar = this.add.text(20, 20, health, {
+        fontSize: '30px',
+        fontWeight: '500',
+        fill: '#154515'
+    });
+
+    healthBar.setScrollFactor(0);
+
+
+    ///////////////////////////////////////////////////////////////////////
+    //Spawning enemies
+    // let spawnAllowed = true;
+    // function createNewEnemy() {
+    //     if (spawnAllowed) {
+    //         var x = Phaser.Math.Between(400, 800);
+    //          enemies.create(x, 400, 'enemy'); // add sprite to group
+    //          queueEnemy(Math.floor(range(0,5))); // call enemy queue for random between 2.5 and 5 seconds
+    //     }
+    // }
+    
+    // function queueEnemy(time) {
+    //     this.game.time.addOnce(time, createNewEnemy); // add a timer that gets called once, then auto disposes to create a new enemy after the time given
+    // }
+
+    // createNewEnemy();
+
+    
+    setInterval(()=>{   
+        if(enemyCount < 10){     
+            var x = Phaser.Math.Between(400, 800);
+            var enemy = enemies.create(x, 450, 'enemy').setScale(0.3).setImmovable();
+            enemy.setBounce(0.6);
+            enemy.setCollideWorldBounds(true);
+            enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
+            enemy.allowGravity = true;
+            enemyCount++;
+        }
+    }, 1000);
+    
+    
+
+    this.physics.add.collider(player, enemies, damage, null, this);
+
+
+    //////////////////////////////////////////////////////////////////
+    //SHOOTING
+
+    // Create the group using the group factory
+	shots = this.physics.add.group();
+	// To move the sprites later on, we have to enable the body
+	shots.enableBody = true;
+	// We're going to set the body type to the ARCADE physics, since we don't need any advanced physics
+	shots.physicsBodyType = Phaser.Physics.ARCADE;
+	/*
+ 
+		This will create 20 sprites and add it to the stage. They're inactive and invisible, but they're there for later use.
+		We only have 20 shot bullets available, and will 'clean' and reset they're off the screen.
+		This way we save on precious resources by not constantly adding & removing new sprites to the stage
+ 
+	*/
+	shots.createMultiple(20, 'shot');
+ 
+	/*
+ 
+		Behind the scenes, this will call the following function on all shots:
+			- events.onOutOfBounds.add(resetshot)
+		Every sprite has an 'events' property, where you can add callbacks to specific events.
+		Instead of looping over every sprite in the group manually, this function will do it for us.
+ 
+	*/
+	//shots.callAll('events.onOutOfBounds.add', 'events.onOutOfBounds', resetshot);
+	// Same as above, set the anchor of every sprite to 0.5, 1.0
+	//shots.callAll('anchor.setTo', 'anchor', 0.5, 1.0);
+ 
+	// This will set 'checkWorldBounds' to true on all sprites in the group
+	//shots.setAll('checkWorldBounds', true);
+ 
+	// ...
+ 
 }
+ 
+function resetshot(shot) {
+	// Destroy the shot
+	shot.kill();
+}
+
+
+
+
+
+
+
+////////////////////////////////////////////
+
 
 // this function will be called when the player touches a coin
 function collectCoin(sprite, tile) {
@@ -120,7 +227,72 @@ function collectCoin(sprite, tile) {
     return false;
 }
 
+function damage(){
+    player.y -= 10;
+
+    if(health <= 0) {
+        //this.physics.pause();
+    }
+
+    player.setTint(0xff0000);
+    setTimeout(()=>{
+        player.setTint();
+    }, 100);
+
+    player.anims.play('turn');
+
+    health -= 3;
+    healthBar.setText(health);
+}
+
+
+ 
+function touchDown() {
+	// Set touchDown to true, so we only trigger this once
+	mouseTouchDown = true;
+	fireshot();
+}
+ 
+function touchUp() {
+	// Set touchDown to false, so we can trigger touchDown on the next click
+	mouseTouchDown = false;
+}
+ 
+function fireshot() {
+	// Get the first shot that's inactive, by passing 'false' as a parameter
+	var shot = shots.getFirstExists(false);
+	if (shot) {
+		// If we have a shot, set it to the starting position
+		shot.reset(ship.x, ship.y - 20);
+		// Give it a velocity of -500 so it starts shooting
+		shot.body.velocity.y = -500;
+	}
+ 
+}
+
+
 function update(time, delta) {
+
+///////////////////////////////////////////////////
+//SHOOTING
+
+
+	// Game.input.activePointer is either the first finger touched, or the mouse
+	// if (game.input.activePointer.isDown) {
+	// 	// We'll manually keep track if the pointer wasn't already down
+	// 	if (!pointer.isDown) {
+	// 		touchDown();
+	// 	}
+	// } else {
+	// 	if (pointer.isDown) {
+	// 		touchUp();
+	// 	}
+	// }
+
+
+////////////////////////////////////////////////
+//MOVEMENT AND JUMPING
+
     if (cursors.left.isDown)
     {
         player.body.setVelocityX(-200);
