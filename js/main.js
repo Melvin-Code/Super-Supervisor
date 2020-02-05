@@ -1,7 +1,7 @@
 var config = {
     type: Phaser.AUTO,
     width: 1100,
-    height: 800,
+    height: 650,
     physics: {
         default: 'arcade',
         arcade: {
@@ -44,8 +44,8 @@ var score = 0;
         
         // this.add.image(this.map.widthInPixels/2, this.map.heightInPixels/4, 'background');
 
-        this.map.createDynamicLayer('default', office, 0, 120).setScale(2.8);
-        
+        this.map.createDynamicLayer('default2', office, 0, 0).setScale(2.8);
+        this.map.createDynamicLayer('default', office, 0, 0).setScale(2.8);
         console.log('Done!');
     
 //     // tiles for the ground layer
