@@ -135,7 +135,6 @@ function create() {
 
     ///////////////////////////////////////////////////////////////////////
     //Spawning enemies
-
     
     setInterval(()=>{   
         if(enemyCount < 10){     
