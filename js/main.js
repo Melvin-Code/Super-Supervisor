@@ -7,7 +7,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: {y: 500},
-            debug: false
+            debug: true
         }
     },
     
@@ -24,7 +24,7 @@ var game = new Phaser.Game(config);
 var map;
 var player;
 var cursors;
-var enemies;
+var enemy;
 var office, coinLayer;
 var text;
 var score = 0;
@@ -42,6 +42,7 @@ function preload() {
     this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
     this.load.image('enemy', 'assets/enemy.png');
     this.load.image('shot', 'assets/bullet.png');
+    
 }
 
 
@@ -56,7 +57,7 @@ function create() {
     // create the ground layer
     // groundLayer = map.createDynamicLayer('World', groundTiles, 0, 0);
     // the player will collide with this layer
-    map.setCollisionByExclusion([-1]);
+   
 
     // coin image used as tileset
     // var coinTiles = map.addTilesetImage('coin');
@@ -64,17 +65,20 @@ function create() {
     // coinLayer = map.createDynamicLayer('Coins', coinTiles, 0, 0);
 
     // set the boundaries of our game world
-    this.physics.world.bounds.width = office.width;
+    this.physics.world.bounds.width = 1150;
     this.physics.world.bounds.height = 600 ;
-
+    
     // create the player sprite    
-    player = this.physics.add.sprite(200, 200, 'player').setScale(1.5);
+    player = this.physics.add.sprite(200, 200, 'player', 64, 64)
     player.setBounce(0.1); // our player will bounce from items
     player.setCollideWorldBounds(true); // don't go out of the map    
-    
+    this.physics.add.player
+    console.log(this.physics)
+    // this.physics.player.world.bounds.width =  1000
     // small fix to our player images, we resize the physics body object slightly
-    player.body.setSize(player.width - 90, player.height - 40);
-    
+    player.body.setSize(32, 45);
+    player.setScale(2)
+    // player.body.setOrigin(0,0)
     // player will collide with the level tiles 
     this.physics.add.collider(map, player);
 
@@ -86,7 +90,9 @@ function create() {
     
 
     //enemies
-    enemies = this.physics.add.group();
+    enemy = this.physics.add.group();
+   
+    
     // this.physics.add.collider(groundLayer, enemies);
 
     // player walk animation
@@ -162,13 +168,19 @@ function create() {
     
     setInterval(()=>{   
         if(enemyCount < 10){     
+            this.physics.world.bounds.width = office.width
+            this.physics.world.bounds.height = 600
             var x = Phaser.Math.Between(400, 800);
-            var enemy = enemies.create(x, 450, 'enemy').setScale(0.3).setImmovable();
+            var enemy = this.physics.add.sprite(500, 200, 'enemy');
+            enemy.body.setSize( 128, 128);
+            enemy.setScale(0.3)
             enemy.setBounce(0.6);
-            enemy.setCollideWorldBounds(true);
+            enemy.setCollideWorldBounds(true)
+            
             enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
             enemy.allowGravity = true;
             enemyCount++;
+            this.physics.add.collider(player, enemy, damage, null, this)
             if(enemy.x >  1150){
                 enemy.kill();
                 enemyCount--;
@@ -178,7 +190,7 @@ function create() {
     
     
 
-    this.physics.add.collider(player, enemies, damage, null, this);
+    this.physics.add.collider(player, enemy, damage, null, this);
 
 
     //////////////////////////////////////////////////////////////////
@@ -296,6 +308,13 @@ if(health <= 30){
     {
         player.body.setVelocityX(200);
         player.anims.play('walk', true);
+       if (player.body.x >= 1100) {
+        //    player.setPosition(1100, player.body.y)
+           player.body.setVelocity(0)
+        //    player.flipX = true; 
+           //cursors.right.isDown = false
+
+        }
         player.flipX = false; // use the original sprite looking to the right
     } else if(player.body.onFloor()) {
         player.body.setVelocityX(0);
