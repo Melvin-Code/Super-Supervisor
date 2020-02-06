@@ -185,24 +185,38 @@ function create() {
 
     ///////////////////////////////////////////////////////////////////////
     //Spawning enemies
-    
+   let enemyArr = [];
     setInterval(()=>{   
-        if(enemyArr.length < 10){     
+        if(enemyArr.length <= 3){ 
+            var x = Phaser.Math.Between(400, 800);
+            enemy = this.physics.add.sprite(x, 200, 'enemy');
+            enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
+        }    
             this.physics.world.bounds.width = office.width;
             this.physics.world.bounds.height = 600;
-            var x = Phaser.Math.Between(400, 800);
-            var enemy = this.physics.add.sprite(x, 0, 'enemyLeft');
-            enemy.body.setSize(32,45);
+    
+            enemy.body.setSize(32, 45);
             enemy.setScale(2);
             enemy.setBounce(0.6);
             enemy.setCollideWorldBounds(true);
             
-            enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
+            // enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
             enemy.allowGravity = true;
-            this.physics.add.collider(player, enemy, damage, null, this) ;
             enemyArr.push(enemy);
-        }
-    }, 2000);
+            this.physics.add.collider(player, enemy, damage, null, this);
+
+            enemyArr.forEach((enem,i)=>{
+                if(enem.body.position.x > 1150){
+                    enemyArr.splice(i,1);
+                    enem.disableBody(true,true);
+                }
+
+            });
+            console.log(enemyArr.length);
+        //}
+        
+         
+    }, 1000);
     
     
 
@@ -361,7 +375,7 @@ enemyArr.forEach(i => {
         player.anims.play('walk', true);
        if (player.body.x >= 1100) {
         //    player.setPosition(1100, player.body.y)
-           player.body.setVelocity(0)
+           player.body.setVelocity(0);
         //    player.flipX = true; 
            //cursors.right.isDown = false
 
@@ -376,9 +390,9 @@ enemyArr.forEach(i => {
     if (cursors.up.isDown && player.body.onFloor())
     {
         player.anims.play('jump', true);
-        player.body.setVelocityY(-500);        
+        player.body.setVelocityY(-520);        
     }
-    else if (!player.body.onFloor())
+    else if (!player.body.onFloor() && player.y < 500)
     {
         player.anims.play('jump', true);
     }
