@@ -7,7 +7,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: {y: 500},
-            debug: false
+            debug: true
         }
     },
     
@@ -20,13 +20,7 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
-
-var map;
-var player;
-var cursors;
-var enemies;
-var office, coinLayer;
-var text;
+let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime;
 var score = 0;
 let enemyCount = 0;
 var health = 100;
@@ -46,6 +40,10 @@ function preload() {
 
 
 function create() {
+
+    //Starting time
+    startingTime = new Date().getTime();
+
     // load the map 
     map = this.make.tilemap({key: 'map'});
 
@@ -64,7 +62,7 @@ function create() {
     // coinLayer = map.createDynamicLayer('Coins', coinTiles, 0, 0);
 
     // set the boundaries of our game world
-    this.physics.world.bounds.width = office.width;
+    this.physics.world.bounds.width = 1150;
     this.physics.world.bounds.height = 600 ;
 
     // create the player sprite    
@@ -83,7 +81,6 @@ function create() {
     // will be called    
     // this.physics.add.overlap(player, coinLayer);
 
-    
 
     //enemies
     enemies = this.physics.add.group();
@@ -123,6 +120,7 @@ function create() {
     ///////////////////////////////////////////////////////
     //SCORE
 
+    //timedEvent = this.time.delayedCall(3000, onEvent, [], this);
 
     scoreText = this.add.text(20, 60, 'Score: ', {
         fontSize: '35px',
@@ -159,27 +157,23 @@ function create() {
 
     ///////////////////////////////////////////////////////////////////////
     //Spawning enemies
-    
-    setInterval(()=>{   
-        if(enemyCount < 10){     
-            var x = Phaser.Math.Between(400, 800);
-            var enemy = enemies.create(x, 450, 'enemy').setScale(0.3).setImmovable();
-            enemy.setBounce(0.6);
-            enemy.setCollideWorldBounds(true);
-            enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
-            enemy.allowGravity = true;
-            enemyCount++;
-            if(enemy.x >  1150){
-                enemy.kill();
-                enemyCount--;
-            }    
-        }
-    }, 2000);
-    
-    
-
+    let enemySpawn = async () => {
+        await setInterval(()=>{   
+            if(enemyCount < 10){     
+                var x = Phaser.Math.Between(400, 800);
+                var enemy = enemies.create(x, 450, 'enemy').setScale(0.3).setImmovable();
+                enemy.setBounce(0.6);
+                enemy.setCollideWorldBounds(true);
+                enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
+                enemy.allowGravity = true;
+                enemyCount++;
+            
+            }
+        }, 2000);    
+    };
     this.physics.add.collider(player, enemies, damage, null, this);
-
+enemySpawn();
+addScore();
 
     //////////////////////////////////////////////////////////////////
     //SHOOTING
@@ -187,7 +181,6 @@ function create() {
     //lol nvm
  
 }
- 
 
 function resetshot(shot) {
 	// Destroy the shot
@@ -225,34 +218,50 @@ function damage(){
     healthNumber.setText(health);
 }
 
+//////////////////////////////////////////////////
+//SHOOTING
+ 
+// function touchDown() {
+// 	// Set touchDown to true, so we only trigger this once
+// 	mouseTouchDown = true;
+// 	fireshot();
+// }
+ 
+// function touchUp() {
+// 	// Set touchDown to false, so we can trigger touchDown on the next click
+// 	mouseTouchDown = false;
+// }
+ 
+// function fireshot() {
+// 	// Get the first shot that's inactive, by passing 'false' as a parameter
+// 	var shot = shots.getFirstExists(false);
+// 	if (shot) {
+// 		// If we have a shot, set it to the starting position
+// 		shot.reset(ship.x, ship.y - 20);
+// 		// Give it a velocity of -500 so it starts shooting
+// 		shot.body.velocity.y = -500;
+// 	}
+// }
 
- 
-function touchDown() {
-	// Set touchDown to true, so we only trigger this once
-	mouseTouchDown = true;
-	fireshot();
-}
- 
-function touchUp() {
-	// Set touchDown to false, so we can trigger touchDown on the next click
-	mouseTouchDown = false;
-}
- 
-function fireshot() {
-	// Get the first shot that's inactive, by passing 'false' as a parameter
-	var shot = shots.getFirstExists(false);
-	if (shot) {
-		// If we have a shot, set it to the starting position
-		shot.reset(ship.x, ship.y - 20);
-		// Give it a velocity of -500 so it starts shooting
-		shot.body.velocity.y = -500;
-	}
- 
+function addScore(){
+    const startTime = new Date();
+    console.log(startTime.getTime());
 }
 
 
 function update(time, delta) {
 
+///////////////////////////////////////////////////
+//SCORE
+
+currentTime = new Date().getTime();
+score += Math.floor(Math.floor((currentTime - startingTime)) / 2000);
+
+text = this.add.text(140, 60, score, {
+    fontSize: '35px',
+    fill: '#fff',
+    backgroundColor: '#000'
+});
 ///////////////////////////////////////////////////
 //SHOOTING
 
@@ -284,6 +293,21 @@ if(health <= 30){
 
 
 ////////////////////////////////////////////////
+//ENEMY SPRITE CHANGE
+
+enemies.children.entries.forEach(enemy => {
+    if(enemy.body.velocity.x < 0){
+        
+    }
+    else if(enemy.body.velocity.x > 0){
+        
+    }
+    else {
+        
+    }
+});
+
+////////////////////////////////////////////////
 //MOVEMENT AND JUMPING
 
     if (cursors.left.isDown)
@@ -297,7 +321,8 @@ if(health <= 30){
         player.body.setVelocityX(200);
         player.anims.play('walk', true);
         player.flipX = false; // use the original sprite looking to the right
-    } else if(player.body.onFloor()) {
+    }
+    else if (player.body.onFloor()) {
         player.body.setVelocityX(0);
         player.anims.play('idle', true);
     }
