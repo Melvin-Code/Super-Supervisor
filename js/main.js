@@ -20,33 +20,31 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
-
-var map;
-var player;
-var cursors;
-var enemy;
-var office, coinLayer;
-var text;
+let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime;
+let enemyArr = [];
 var score = 0;
-let enemyCount = 0;
 var health = 100;
 
 function preload() {
     // map made with Tiled in JSON format
     this.load.tilemapTiledJSON('map', 'assets/officeMap.json');
-    // tiles in spritesheet 
-    this.load.spritesheet('tiles', 'assets/tiles.png', {frameWidth: 70, frameHeight: 70});
-    // simple coin image
+    // enemies in spritesheet 
+    this.load.spritesheet('enemyRight', 'assets/enemyright.png', {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet('enemyLeft', 'assets/enemyleft.png', {frameWidth: 32, frameHeight: 32});
+    // tiles for map
     this.load.image('terrainPNG', 'assets/Office_furniture_set.png');
     // player animations
     this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
-    this.load.image('enemy', 'assets/enemy.png');
     this.load.image('shot', 'assets/bullet.png');
     
 }
 
 
 function create() {
+
+    //Starting time
+    startingTime = new Date().getTime();
+
     // load the map 
     map = this.make.tilemap({key: 'map'});
 
@@ -69,15 +67,14 @@ function create() {
     this.physics.world.bounds.height = 600 ;
     
     // create the player sprite    
-    player = this.physics.add.sprite(200, 200, 'player', 64, 64)
+    player = this.physics.add.sprite(200, 200, 'player', 64, 64);
     player.setBounce(0.1); // our player will bounce from items
     player.setCollideWorldBounds(true); // don't go out of the map    
-    this.physics.add.player
-    console.log(this.physics)
+    
     // this.physics.player.world.bounds.width =  1000
     // small fix to our player images, we resize the physics body object slightly
     player.body.setSize(32, 45);
-    player.setScale(2)
+    player.setScale(2);
     // player.body.setOrigin(0,0)
     // player will collide with the level tiles 
     this.physics.add.collider(map, player);
@@ -87,13 +84,13 @@ function create() {
     // will be called    
     // this.physics.add.overlap(player, coinLayer);
 
-    
 
     //enemies
     enemy = this.physics.add.group();
    
-    
-    // this.physics.add.collider(groundLayer, enemies);
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //ANIMATIONS
+
 
     // player walk animation
     this.anims.create({
@@ -113,6 +110,22 @@ function create() {
         frames: [{key: 'player', frame: 'p1_jump'}],
         frameRate: 10,
     });
+    
+    
+    //enemy walking
+    
+    this.anims.create({
+        key: 'left',
+        frames: this.anims.generateFrameNumbers('enemyLeft', { start: 0, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('enemyRight', { start: 0, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+    });
 
 
     cursors = this.input.keyboard.createCursorKeys();
@@ -122,13 +135,11 @@ function create() {
     // make the camera follow the player
     this.cameras.main.startFollow(player);
 
-    // set background color, so the sky is not black    
-    // this.cameras.main.setBackgroundColor('#ccccff');
-
 
     ///////////////////////////////////////////////////////
     //SCORE
 
+    //timedEvent = this.time.delayedCall(3000, onEvent, [], this);
 
     scoreText = this.add.text(20, 60, 'Score: ', {
         fontSize: '35px',
@@ -180,7 +191,7 @@ function create() {
             enemy.body.setSize( 128, 128);
             enemy.setScale(0.3)
             enemy.setBounce(0.6);
-            enemy.setCollideWorldBounds(true)
+            enemy.setCollideWorldBounds(true);
             
             // enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
             enemy.allowGravity = true;
@@ -213,12 +224,11 @@ function create() {
     //lol nvm
  
 }
- 
 
-function resetshot(shot) {
-	// Destroy the shot
-	shot.kill();
-}
+// function resetshot(shot) {
+// 	// Destroy the shot
+// 	shot.kill();
+// }
 
 
 ////////////////////////////////////////////
@@ -251,34 +261,50 @@ function damage(){
     healthNumber.setText(health);
 }
 
+//////////////////////////////////////////////////
+//SHOOTING
+ 
+// function touchDown() {
+// 	// Set touchDown to true, so we only trigger this once
+// 	mouseTouchDown = true;
+// 	fireshot();
+// }
+ 
+// function touchUp() {
+// 	// Set touchDown to false, so we can trigger touchDown on the next click
+// 	mouseTouchDown = false;
+// }
+ 
+// function fireshot() {
+// 	// Get the first shot that's inactive, by passing 'false' as a parameter
+// 	var shot = shots.getFirstExists(false);
+// 	if (shot) {
+// 		// If we have a shot, set it to the starting position
+// 		shot.reset(ship.x, ship.y - 20);
+// 		// Give it a velocity of -500 so it starts shooting
+// 		shot.body.velocity.y = -500;
+// 	}
+// }
 
- 
-function touchDown() {
-	// Set touchDown to true, so we only trigger this once
-	mouseTouchDown = true;
-	fireshot();
-}
- 
-function touchUp() {
-	// Set touchDown to false, so we can trigger touchDown on the next click
-	mouseTouchDown = false;
-}
- 
-function fireshot() {
-	// Get the first shot that's inactive, by passing 'false' as a parameter
-	var shot = shots.getFirstExists(false);
-	if (shot) {
-		// If we have a shot, set it to the starting position
-		shot.reset(ship.x, ship.y - 20);
-		// Give it a velocity of -500 so it starts shooting
-		shot.body.velocity.y = -500;
-	}
- 
+function addScore(){
+    const startTime = new Date();
+    console.log(startTime.getTime());
 }
 
 
 function update(time, delta) {
 
+///////////////////////////////////////////////////
+//SCORE
+
+currentTime = new Date().getTime();
+score += Math.floor(Math.floor((currentTime - startingTime)) / 2000);
+
+text = this.add.text(140, 60, score, {
+    fontSize: '35px',
+    fill: '#fff',
+    backgroundColor: '#000'
+});
 ///////////////////////////////////////////////////
 //SHOOTING
 
@@ -307,7 +333,27 @@ if(health > 30 && health <= 70){
 if(health <= 30){
     healthNumber.setFill('#f00');
 }
+if(health < 0){
+    this.gameOver();
+}
 
+
+////////////////////////////////////////////////
+//ENEMY SPRITE CHANGE
+
+enemyArr.forEach(i => {
+    if(i.body.velocity.x < 0){
+        i.anims.play('left', true); // walk left
+        
+    }
+    else if(i.body.velocity.x > 0){
+        i.anims.play('right', true);
+        
+    }
+    else {
+        console.log('no');
+    }
+});
 
 ////////////////////////////////////////////////
 //MOVEMENT AND JUMPING
@@ -330,7 +376,8 @@ if(health <= 30){
 
         }
         player.flipX = false; // use the original sprite looking to the right
-    } else if(player.body.onFloor()) {
+    }
+    else if (player.body.onFloor()) {
         player.body.setVelocityX(0);
         player.anims.play('idle', true);
     }
