@@ -31,6 +31,7 @@ function preload() {
     // enemies in spritesheet 
     this.load.spritesheet('enemyRight', 'assets/enemyright.png', {frameWidth: 32, frameHeight: 32});
     this.load.spritesheet('enemyLeft', 'assets/enemyleft.png', {frameWidth: 32, frameHeight: 32});
+    this.load.atlas('enemy', 'assets/enemy.png', 'assets/player.json');
     // tiles for map
     this.load.image('terrainPNG', 'assets/Office_furniture_set.png');
     // player animations
@@ -114,18 +115,26 @@ function create() {
     
     //enemy walking
     
+
     this.anims.create({
-        key: 'left',
-        frames: this.anims.generateFrameNumbers('enemyLeft', { start: 0, end: 8 }),
+        key: 'walkEnemy',
+        frames: this.anims.generateFrameNames('enemy', {prefix: 'p1_walk', start: 1, end: 9, zeroPad: 2}),
         frameRate: 10,
         repeat: -1
     });
-    this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('enemyRight', { start: 0, end: 8 }),
-        frameRate: 10,
-        repeat: -1
-    });
+
+    // this.anims.create({
+    //     key: 'left',
+    //     frames: this.anims.generateFrameNumbers('enemyLeft'),
+    //     frameRate: 10,
+    //     repeat: -1
+    // });
+    // this.anims.create({
+    //     key: 'right',
+    //     frames: this.anims.generateFrameNumbers('enemyRight'),
+    //     frameRate: 1,
+    //     repeat: -1
+    // });
 
 
     cursors = this.input.keyboard.createCursorKeys();
@@ -182,9 +191,9 @@ function create() {
             this.physics.world.bounds.width = office.width;
             this.physics.world.bounds.height = 600;
             var x = Phaser.Math.Between(400, 800);
-            var enemy = this.physics.add.sprite(500, -40, 'enemy',32,32);
-            enemy.body.setSize( 32, 32);
-            enemy.setScale(3);
+            var enemy = this.physics.add.sprite(x, 0, 'enemyLeft');
+            enemy.body.setSize(32,45);
+            enemy.setScale(2);
             enemy.setBounce(0.6);
             enemy.setCollideWorldBounds(true);
             
@@ -325,12 +334,12 @@ if(health < 0){
 
 enemyArr.forEach(i => {
     if(i.body.velocity.x < 0){
-        i.anims.play('left', true); // walk left
-        
+        i.anims.play('walkEnemy', true); // walk left
+        i.flipX = true;
     }
     else if(i.body.velocity.x > 0){
-        i.anims.play('right', true);
-        
+        i.anims.play('walkEnemy', true);
+        i.flipX = false;
     }
     else {
         console.log('no');
