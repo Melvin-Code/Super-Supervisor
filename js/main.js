@@ -1,8 +1,8 @@
 /* jshint esversion:9 */
 var config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 550,
+    width: 1150,
+    height: 690,
     physics: {
         default: 'arcade',
         arcade: {
@@ -51,8 +51,8 @@ function create() {
 
     // tiles for the ground layer
     var office = map.addTilesetImage('test','terrainPNG');
-         map.createDynamicLayer('default2', office, 0, 0).setScale(2.3);
-            map.createStaticLayer('default', office, 0, 0).setScale(2.3);
+         map.createDynamicLayer('default2', office, 0, 0).setScale(2.9);
+            map.createStaticLayer('default', office, 0, 0).setScale(2.9);
     // create the ground layer
     // groundLayer = map.createDynamicLayer('World', groundTiles, 0, 0);
     // the player will collide with this layer
@@ -65,7 +65,7 @@ function create() {
 
     // set the boundaries of our game world
     this.physics.world.bounds.width = office.width;
-    this.physics.world.bounds.height = 475 ;
+    this.physics.world.bounds.height = 600 ;
 
     // create the player sprite    
     player = this.physics.add.sprite(200, 200, 'player').setScale(1.5);
@@ -73,7 +73,7 @@ function create() {
     player.setCollideWorldBounds(true); // don't go out of the map    
     
     // small fix to our player images, we resize the physics body object slightly
-    player.body.setSize(player.width - 64, player.height - 40);
+    player.body.setSize(player.width - 90, player.height - 40);
     
     // player will collide with the level tiles 
     this.physics.add.collider(map, player);
@@ -83,6 +83,7 @@ function create() {
     // will be called    
     // this.physics.add.overlap(player, coinLayer);
 
+    
 
     //enemies
     enemies = this.physics.add.group();
@@ -118,21 +119,42 @@ function create() {
     // set background color, so the sky is not black    
     // this.cameras.main.setBackgroundColor('#ccccff');
 
-    // this text will show the score
-    text = this.add.text(20, 570, '0', {
-        fontSize: '20px',
-        fill: '#ffffff'
+
+    ///////////////////////////////////////////////////////
+    //SCORE
+
+
+    scoreText = this.add.text(20, 60, 'Score: ', {
+        fontSize: '35px',
+        fill: '#fff',
+        backgroundColor: '#000'
+    });
+    text = this.add.text(140, 60, score, {
+        fontSize: '35px',
+        fill: '#fff',
+        backgroundColor: '#000'
     });
     // fix the text to the camera
     text.setScrollFactor(0);
+    
+    
+    /////////////////////////////////////////////////////
+    //HEALTH
 
-    healthBar = this.add.text(20, 20, health, {
-        fontSize: '30px',
+    healthNumber = this.add.text(160, 20, health, {
+        fontSize: '35px',
         fontWeight: '500',
-        fill: '#154515'
+        backgroundColor: '#000'
     });
 
-    healthBar.setScrollFactor(0);
+    healthText = this.add.text(20, 20, 'Health: ', {
+        fontSize: '35px',
+        fontWeight: '500',
+        backgroundColor: '#000'
+    });
+
+
+    healthNumber.setScrollFactor(0);
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -147,8 +169,12 @@ function create() {
             enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
             enemy.allowGravity = true;
             enemyCount++;
+            if(enemy.x >  1150){
+                enemy.kill();
+                enemyCount--;
+            }    
         }
-    }, 1000);
+    }, 2000);
     
     
 
@@ -158,61 +184,28 @@ function create() {
     //////////////////////////////////////////////////////////////////
     //SHOOTING
 
-    // Create the group using the group factory
-	shots = this.physics.add.group();
-	// To move the sprites later on, we have to enable the body
-	shots.enableBody = true;
-	// We're going to set the body type to the ARCADE physics, since we don't need any advanced physics
-	shots.physicsBodyType = Phaser.Physics.ARCADE;
-	/*
- 
-		This will create 20 sprites and add it to the stage. They're inactive and invisible, but they're there for later use.
-		We only have 20 shot bullets available, and will 'clean' and reset they're off the screen.
-		This way we save on precious resources by not constantly adding & removing new sprites to the stage
- 
-	*/
-	shots.createMultiple(20, 'shot');
- 
-	/*
- 
-		Behind the scenes, this will call the following function on all shots:
-			- events.onOutOfBounds.add(resetshot)
-		Every sprite has an 'events' property, where you can add callbacks to specific events.
-		Instead of looping over every sprite in the group manually, this function will do it for us.
- 
-	*/
-	//shots.callAll('events.onOutOfBounds.add', 'events.onOutOfBounds', resetshot);
-	// Same as above, set the anchor of every sprite to 0.5, 1.0
-	//shots.callAll('anchor.setTo', 'anchor', 0.5, 1.0);
- 
-	// This will set 'checkWorldBounds' to true on all sprites in the group
-	//shots.setAll('checkWorldBounds', true);
- 
-	// ...
+    //lol nvm
  
 }
  
+
 function resetshot(shot) {
 	// Destroy the shot
 	shot.kill();
 }
 
 
-
-
-
-
-
 ////////////////////////////////////////////
 
 
-// this function will be called when the player touches a coin
-function collectCoin(sprite, tile) {
-    coinLayer.removeTileAt(tile.x, tile.y); // remove the tile/coin
-    score++; // add 10 points to the score
-    text.setText(score); // set the text to show the current score
-    return false;
-}
+// // this function will be called when the player touches a coin
+// function collectCoin(sprite, tile) {
+//     coinLayer.removeTileAt(tile.x, tile.y); // remove the tile/coin
+//     score++; // add 10 points to the score
+//     text.setText(score); // set the text to show the current score
+//     return false;
+// }
+
 
 function damage(){
     player.y -= 10;
@@ -229,7 +222,7 @@ function damage(){
     player.anims.play('turn');
 
     health -= 3;
-    healthBar.setText(health);
+    healthNumber.setText(health);
 }
 
 
@@ -274,7 +267,20 @@ function update(time, delta) {
 	// 	if (pointer.isDown) {
 	// 		touchUp();
 	// 	}
-	// }
+    // }
+     
+
+if(health > 70){
+    healthNumber.setFill('#0f0');
+}
+
+if(health > 30 && health <= 70){
+    healthNumber.setFill('#ff0');
+}
+
+if(health <= 30){
+    healthNumber.setFill('#f00');
+}
 
 
 ////////////////////////////////////////////////
