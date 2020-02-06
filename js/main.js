@@ -165,29 +165,43 @@ function create() {
 
     ///////////////////////////////////////////////////////////////////////
     //Spawning enemies
-    
+   let enemyArr = []
+   let eneemy; 
     setInterval(()=>{   
-        if(enemyCount < 10){     
+        if(enemyArr.length <= 3){ 
+            enemy = this.physics.add.sprite(500, 200, 'enemy');
+            var x = Phaser.Math.Between(400, 800);
+            enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
+        }    
             this.physics.world.bounds.width = office.width
             this.physics.world.bounds.height = 600
-            var x = Phaser.Math.Between(400, 800);
-            var enemy = this.physics.add.sprite(500, 200, 'enemy');
+            // var x = Phaser.Math.Between(400, 800);
+    
             enemy.body.setSize( 128, 128);
             enemy.setScale(0.3)
             enemy.setBounce(0.6);
             enemy.setCollideWorldBounds(true)
             
-            enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
+            // enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
             enemy.allowGravity = true;
-            enemyCount++;
+            enemyArr.push(enemy);
             this.physics.add.collider(player, enemy, damage, null, this)
-            if(enemy.x >  1150){
-                enemy.kill();
-                enemyCount--;
-            }    
-        }
-    }, 2000);
-    
+
+            enemyArr.forEach((enem,i)=>{
+                if(enem.body.position.x > 1150){
+                    console.log('pop',enem.body.position.x)
+                    //enemyArr.pop()
+                    enemyArr.splice(i,1)
+                    enem.disableBody(true,true)
+                }
+
+            })
+            console.log(enemyArr.length)
+        //}
+        
+         
+    }, 1000);
+    ;
     
 
     this.physics.add.collider(player, enemy, damage, null, this);
