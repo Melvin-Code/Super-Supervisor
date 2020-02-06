@@ -182,7 +182,7 @@ function create() {
             this.physics.world.bounds.width = office.width;
             this.physics.world.bounds.height = 600;
             var x = Phaser.Math.Between(400, 800);
-            var enemy = this.physics.add.sprite(500, -40, 'enemy');
+            var enemy = this.physics.add.sprite(500, -40, 'enemy',32,32);
             enemy.body.setSize( 32, 32);
             enemy.setScale(3);
             enemy.setBounce(0.6);
@@ -314,6 +314,9 @@ if(health > 30 && health <= 70){
 
 if(health <= 30){
     healthNumber.setFill('#f00');
+}
+if(health < 0){
+    this.gameOver();
 }
 
 
