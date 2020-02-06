@@ -102,6 +102,6 @@
     "version": "Leshy SpriteSheet Tool v0.8.4",
     "image": "player1.png",
     "size": { "w": 832, "h": 1344 },
-    "scale": 1
+    "scale": 0
   }
 }

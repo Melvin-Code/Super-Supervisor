@@ -21,21 +21,22 @@ var config = {
 
 var game = new Phaser.Game(config);
 let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime;
+let enemyArr = [];
 var score = 0;
-let enemyCount = 0;
 var health = 100;
 
 function preload() {
     // map made with Tiled in JSON format
     this.load.tilemapTiledJSON('map', 'assets/officeMap.json');
-    // tiles in spritesheet 
-    this.load.spritesheet('tiles', 'assets/tiles.png', {frameWidth: 70, frameHeight: 70});
-    // simple coin image
+    // enemies in spritesheet 
+    this.load.spritesheet('enemyRight', 'assets/enemyright.png', {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet('enemyLeft', 'assets/enemyleft.png', {frameWidth: 32, frameHeight: 32});
+    // tiles for map
     this.load.image('terrainPNG', 'assets/Office_furniture_set.png');
     // player animations
     this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
-    this.load.image('enemy', 'assets/enemy.png');
     this.load.image('shot', 'assets/bullet.png');
+    
 }
 
 
@@ -54,7 +55,7 @@ function create() {
     // create the ground layer
     // groundLayer = map.createDynamicLayer('World', groundTiles, 0, 0);
     // the player will collide with this layer
-    map.setCollisionByExclusion([-1]);
+   
 
     // coin image used as tileset
     // var coinTiles = map.addTilesetImage('coin');
@@ -64,15 +65,17 @@ function create() {
     // set the boundaries of our game world
     this.physics.world.bounds.width = 1150;
     this.physics.world.bounds.height = 600 ;
-
+    
     // create the player sprite    
-    player = this.physics.add.sprite(200, 200, 'player').setScale(1.5);
+    player = this.physics.add.sprite(200, 200, 'player', 64, 64);
     player.setBounce(0.1); // our player will bounce from items
     player.setCollideWorldBounds(true); // don't go out of the map    
     
+    // this.physics.player.world.bounds.width =  1000
     // small fix to our player images, we resize the physics body object slightly
-    player.body.setSize(player.width - 90, player.height - 40);
-    
+    player.body.setSize(32, 45);
+    player.setScale(2);
+    // player.body.setOrigin(0,0)
     // player will collide with the level tiles 
     this.physics.add.collider(map, player);
 
@@ -83,8 +86,11 @@ function create() {
 
 
     //enemies
-    enemies = this.physics.add.group();
-    // this.physics.add.collider(groundLayer, enemies);
+    enemy = this.physics.add.group();
+   
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //ANIMATIONS
+
 
     // player walk animation
     this.anims.create({
@@ -104,6 +110,22 @@ function create() {
         frames: [{key: 'player', frame: 'p1_jump'}],
         frameRate: 10,
     });
+    
+    
+    //enemy walking
+    
+    this.anims.create({
+        key: 'left',
+        frames: this.anims.generateFrameNumbers('enemyLeft', { start: 0, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('enemyRight', { start: 0, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+    });
 
 
     cursors = this.input.keyboard.createCursorKeys();
@@ -112,9 +134,6 @@ function create() {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     // make the camera follow the player
     this.cameras.main.startFollow(player);
-
-    // set background color, so the sky is not black    
-    // this.cameras.main.setBackgroundColor('#ccccff');
 
 
     ///////////////////////////////////////////////////////
@@ -157,23 +176,29 @@ function create() {
 
     ///////////////////////////////////////////////////////////////////////
     //Spawning enemies
-    let enemySpawn = async () => {
-        await setInterval(()=>{   
-            if(enemyCount < 10){     
-                var x = Phaser.Math.Between(400, 800);
-                var enemy = enemies.create(x, 450, 'enemy').setScale(0.3).setImmovable();
-                enemy.setBounce(0.6);
-                enemy.setCollideWorldBounds(true);
-                enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
-                enemy.allowGravity = true;
-                enemyCount++;
+    
+    setInterval(()=>{   
+        if(enemyArr.length < 10){     
+            this.physics.world.bounds.width = office.width;
+            this.physics.world.bounds.height = 600;
+            var x = Phaser.Math.Between(400, 800);
+            var enemy = this.physics.add.sprite(500, -40, 'enemy');
+            enemy.body.setSize( 32, 32);
+            enemy.setScale(3);
+            enemy.setBounce(0.6);
+            enemy.setCollideWorldBounds(true);
             
-            }
-        }, 2000);    
-    };
-    this.physics.add.collider(player, enemies, damage, null, this);
-enemySpawn();
-addScore();
+            enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
+            enemy.allowGravity = true;
+            this.physics.add.collider(player, enemy, damage, null, this) ;
+            enemyArr.push(enemy);
+        }
+    }, 2000);
+    
+    
+
+    this.physics.add.collider(player, enemy, damage, null, this);
+
 
     //////////////////////////////////////////////////////////////////
     //SHOOTING
@@ -182,10 +207,10 @@ addScore();
  
 }
 
-function resetshot(shot) {
-	// Destroy the shot
-	shot.kill();
-}
+// function resetshot(shot) {
+// 	// Destroy the shot
+// 	shot.kill();
+// }
 
 
 ////////////////////////////////////////////
@@ -295,15 +320,17 @@ if(health <= 30){
 ////////////////////////////////////////////////
 //ENEMY SPRITE CHANGE
 
-enemies.children.entries.forEach(enemy => {
-    if(enemy.body.velocity.x < 0){
+enemyArr.forEach(i => {
+    if(i.body.velocity.x < 0){
+        i.anims.play('left', true); // walk left
         
     }
-    else if(enemy.body.velocity.x > 0){
+    else if(i.body.velocity.x > 0){
+        i.anims.play('right', true);
         
     }
     else {
-        
+        console.log('no');
     }
 });
 
@@ -320,6 +347,13 @@ enemies.children.entries.forEach(enemy => {
     {
         player.body.setVelocityX(200);
         player.anims.play('walk', true);
+       if (player.body.x >= 1100) {
+        //    player.setPosition(1100, player.body.y)
+           player.body.setVelocity(0)
+        //    player.flipX = true; 
+           //cursors.right.isDown = false
+
+        }
         player.flipX = false; // use the original sprite looking to the right
     }
     else if (player.body.onFloor()) {
