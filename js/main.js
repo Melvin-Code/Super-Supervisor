@@ -184,9 +184,9 @@ function create() {
 
     setInterval(()=>{   
         if(enemyArr.length <= 3){ 
-            var x = Phaser.Math.Between(400, 800);
-            enemy = this.physics.add.sprite(x, 200, 'enemy');
-            enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
+            var x = Phaser.Math.Between(800, 1000);
+            enemy = this.physics.add.sprite(x, 0, 'enemy');
+            enemy.setVelocity(Phaser.Math.Between(-600, -100), 100);
         }
             this.physics.world.bounds.width = office.width;
             this.physics.world.bounds.height = 600;
@@ -195,6 +195,7 @@ function create() {
             enemy.setScale(2);
             enemy.setBounce(0.6);
             enemy.setCollideWorldBounds(true);
+            enemy.body.immovable = true;
             
             enemy.allowGravity = true;
             enemyArr.push(enemy);
@@ -248,10 +249,10 @@ function damage(){
 //SHOOTING
  
 
+
+
+
 /////////////////////////////////////////////////
-
-
-
 
 
 function update(time, delta) {
@@ -261,7 +262,7 @@ function update(time, delta) {
 
     currentTime = new Date().getTime();
     score += Math.floor(Math.floor((currentTime - startingTime)) / 2000);
-
+    score = Math.floor(score / 1.2);
     text = this.add.text(140, 60, score, {
         fontSize: '35px',
         fill: '#fff',
