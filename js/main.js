@@ -24,7 +24,7 @@ var game = new Phaser.Game(config);
 //////////////////////////////////////////////////
 //GLOBAL VARIABLES
 
-let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime, hurt, jump;
+let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime, hurt, jump, wKey, sKey, aKey, dKey;
 let enemyArr = [];
 var score = 0;
 var health = 100;
@@ -65,6 +65,11 @@ function create() {
     gameOverText.visible = false;
     
     cursors = this.input.keyboard.createCursorKeys();
+
+    wKey = this.input.keyboard.addKey('W');
+    sKey = this.input.keyboard.addKey('S');
+    aKey = this.input.keyboard.addKey('A');
+    dKey = this.input.keyboard.addKey('D');
 
     //sounds
     hurt = this.sound.add('hurtSnd');
@@ -352,36 +357,38 @@ function update(time, delta) {
     //////////////////////////////////////////////////
     //PLAYER MOVEMENT AND JUMPING
 
-    if (cursors.left.isDown){
+    if (cursors.left.isDown || aKey.isDown && cursors.shift.isUp){
         player.body.setVelocityX(-200);
         player.anims.play('walk', true); // walk left
         player.flipX = true; // flip the sprite to the left
     }
-    else if (cursors.right.isDown){
+    else if (cursors.right.isDown || dKey.isDown && cursors.shift.isUp){
         player.body.setVelocityX(200);
         player.anims.play('walk', true);
         player.flipX = false; // use the original sprite looking to the right
         if(player.body.x > 1100) {
-          player.body.setVelocity(0)
+          player.body.setVelocity(0);
         }
     }
-    // if (cursors.left.isDown){
-    //     player.body.setVelocityX(-200);
-    //     player.anims.play('walk', true); // walk left
-    //     player.flipX = true; // flip the sprite to the left
-    // }
-    // else if (cursors.right.isDown){
-    //     player.body.setVelocityX(200);
-    //     player.anims.play('walk', true);
-    //     player.flipX = false; // use the original sprite looking to the right
-    // }
+    //running left
+     else if (cursors.left.isDown || aKey.isDown && cursors.shift.isDown){
+        player.body.setVelocityX(-400);
+        player.anims.play('walk', true); // walk left
+        player.flipX = true; // flip the sprite to the left
+    }
+    //running right
+    else if (cursors.right.isDown || dKey.isDown && cursors.shift.isDown){
+        player.body.setVelocityX(400);
+        player.anims.play('walk', true);
+        player.flipX = false; // use the original sprite looking to the right
+    }
     else if (player.body.onFloor()) {
         player.body.setVelocityX(0);
         player.anims.play('idle', true);
     }
 
     // jump 
-    if (cursors.up.isDown && player.body.onFloor()){
+    if (cursors.up.isDown || wKey.isDown && player.body.onFloor()){
         jump.play();
         player.anims.play('jump', true);
         player.body.setVelocityY(-500);        
