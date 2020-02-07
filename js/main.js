@@ -468,7 +468,7 @@ function update(time, delta) {
   });
   bulletArr.forEach((bullet, i) => {
     console.log(bullet.body.position.x, i)
-    if (bullet.body.position.x <= 10) {
+    if (bullet.body.position.x < 10) {
       bulletArr.splice(i, 1);
       bullet.disableBody(true, true);
 
