@@ -7,7 +7,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: {y: 500},
-            debug: true
+            debug: false
         }
     },
     
@@ -207,7 +207,7 @@ function create() {
         if(enemyArr.length <= 3){ 
             var x = Phaser.Math.Between(800, 1000);
             enemy = this.physics.add.sprite(x, 0, 'enemy');
-            enemy.setVelocity(Phaser.Math.Between(-600, -100), 100);
+            enemy.setVelocity(Phaser.Math.Between(-500, -100), 100);
         }
             this.physics.world.bounds.width = office.width;
             this.physics.world.bounds.height = 600;
@@ -307,13 +307,23 @@ function update(time, delta) {
     if(health <= 30){
         healthNumber.setFill('#f00');
     }
-    if(health < 0){
+    if(health < -1){
         //gameOverText.visible = true;
-        player.anims.play('fall', true);
+        // player.anims.play('fall', true);
+        // setTimeout(() => {
+        //     
+        // }, 500);
+        if(confirm(`THE OFFICE WAS TAKEN OVER \n \n Your score was ${score} \n \n Click ok to restart`)){
+            location.reload();
+        }else{
+            if(confirm(`Just click ok please`)){
+                location.reload();
+            }
+        }
+        
         setTimeout(() => {
             this.gameOver();
-        }, 500);
-        
+        }, 2000);
     }
 
     //////////////////////////////////////////////////
@@ -342,32 +352,38 @@ function update(time, delta) {
     //////////////////////////////////////////////////
     //PLAYER MOVEMENT AND JUMPING
 
-    if (cursors.left.isDown)
-    {
+    if (cursors.left.isDown){
         player.body.setVelocityX(-200);
         player.anims.play('walk', true); // walk left
         player.flipX = true; // flip the sprite to the left
     }
-    else if (cursors.right.isDown)
-    {
+    else if (cursors.right.isDown){
         player.body.setVelocityX(200);
         player.anims.play('walk', true);
         player.flipX = false; // use the original sprite looking to the right
     }
+    // if (cursors.left.isDown){
+    //     player.body.setVelocityX(-200);
+    //     player.anims.play('walk', true); // walk left
+    //     player.flipX = true; // flip the sprite to the left
+    // }
+    // else if (cursors.right.isDown){
+    //     player.body.setVelocityX(200);
+    //     player.anims.play('walk', true);
+    //     player.flipX = false; // use the original sprite looking to the right
+    // }
     else if (player.body.onFloor()) {
         player.body.setVelocityX(0);
         player.anims.play('idle', true);
     }
 
     // jump 
-    if (cursors.up.isDown && player.body.onFloor())
-    {
+    if (cursors.up.isDown && player.body.onFloor()){
         jump.play();
         player.anims.play('jump', true);
-        player.body.setVelocityY(-520);        
+        player.body.setVelocityY(-500);        
     }
-    else if (!player.body.onFloor() && player.y < 500)
-    {
+    else if (!player.body.onFloor() && player.y < 500){
         player.anims.play('jump', true);
     }
 
