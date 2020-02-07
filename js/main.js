@@ -101,10 +101,10 @@ function create() {
     player = this.physics.add.sprite(200, 400, 'player', 64, 64);
     player.setBounce(0.1); // our player will bounce from items
     player.setCollideWorldBounds(true); // don't go out of the map    
-    
-    // small fix to our player images, we resize the physics body object slightly
+     // small fix to our player images, we resize the physics body object slightly
     player.body.setSize(32, 45);
     player.setScale(2);
+    player.body.immovable = true
     // player will collide with the level tiles 
     this.physics.add.collider(map, player);
     // set bounds so the camera won't go outside the game world
@@ -355,6 +355,7 @@ function update(time, delta) {
         player.flipX = false; // use the original sprite looking to the right
         if(player.body.x > 1100) {
           player.body.setVelocity(0)
+        
         }
     }
     else if (player.body.onFloor()) {
@@ -373,6 +374,10 @@ function update(time, delta) {
     {
         player.anims.play('jump', true);
     }
+    if(player.body.x >= 1100){
+      player.body.x = 1100
+    }
+    
 
     //////////////////////////////////////////////////
 }
