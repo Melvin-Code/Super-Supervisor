@@ -73,7 +73,7 @@
       "sourceSize": { "w": 64, "h": 64 }
     },
     {
-      "filename": "p1_jump01",
+      "filename": "p1_jump",
       "frame": { "x": 384, "y": 192, "w": 64, "h": 64 },
       "rotated": false,
       "trimmed": false,
