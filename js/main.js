@@ -48,9 +48,9 @@ function preload() {
     
     // SOUNDS
     // player hurt sound
-    this.load.audio('hurtSnd', '../assets/sound effects/Player_hurt.ogg');
-    this.load.audio('jumpSnd', '../assets/sound effects/Player_jump.ogg');
-    this.load.audio('musicSnd', '../assets/sound effects/soundtrack.mp3');
+    this.load.audio('hurtSnd', 'assets/sound effects/Player_hurt.ogg');
+    this.load.audio('jumpSnd', 'assets/sound effects/Player_jump.ogg');
+    this.load.audio('musicSnd', 'assets/sound effects/soundtrack.mp3');
 }
 
 
