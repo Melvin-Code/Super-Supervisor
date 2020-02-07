@@ -77,7 +77,15 @@
       "frame": { "x": 384, "y": 192, "w": 64, "h": 64 },
       "rotated": false,
       "trimmed": false,
-      "spriteSourceSize": { "x": 384, "y": 192, "w": 64, "h": 94 },
+      "spriteSourceSize": { "x": 384, "y": 192, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "p1_shoot",
+      "frame": { "x": 256, "y": 960, "w": 64, "h": 64 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 256, "y": 960, "w": 64, "h": 64 },
       "sourceSize": { "w": 64, "h": 64 }
     },
     {
