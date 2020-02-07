@@ -48,7 +48,7 @@ function preload() {
 
   // player animations
   this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
-  this.load.image('bullet', 'assets/bullet.png')
+  this.load.image('bullet', 'assets/bullet.png');;;;;;;;;;;;;;
   // SOUNDS
   // player hurt sound
   this.load.audio('hurtSnd', 'assets/sound effects/Player_hurt.ogg');
@@ -113,7 +113,7 @@ function create() {
   // small fix to our player images, we resize the physics body object slightly
   player.body.setSize(32, 45);
   player.setScale(2);
-  player.body.immovable = true
+  player.body.immovable = true;
   // player will collide with the level tiles 
   this.physics.add.collider(map, player);
   // set bounds so the camera won't go outside the game world
@@ -122,7 +122,7 @@ function create() {
   this.cameras.main.startFollow(player);
 
   //bullet group
-  bullets = this.physics.add.group()
+  bullets = this.physics.add.group();
 
 
   //////////////////////////////////////////////////
@@ -284,7 +284,7 @@ function create() {
 function addScore() {
   const startTime = new Date();
   console.log(startTime.getTime());
-  l
+  
 }
 
 
@@ -343,6 +343,8 @@ function update(time, delta) {
   if (health <= 30) {
     healthNumber.setFill('#f00');
   }
+
+  //****************************************************************/
   // if(health < -1){
   //     //gameOverText.visible = true;
   //     // player.anims.play('fall', true);
@@ -361,7 +363,7 @@ function update(time, delta) {
   //         this.gameOver();
   //     }, 2000);
   // }
-
+  //*****************************************************************/
   //////////////////////////////////////////////////
 
 
@@ -395,7 +397,7 @@ function update(time, delta) {
     player.anims.play('walk', true);
     player.flipX = false; // use the original sprite looking to the right
     if (player.body.x > 1100) {
-      player.body.setVelocity(0)
+      player.body.setVelocity(0);
 
     }
   }
@@ -423,19 +425,19 @@ function update(time, delta) {
     player.anims.play('jump', true);
   }
   if (player.body.x >= 1100) {
-    player.body.x = 1100
+    player.body.x = 1100;
   }
   if (player.body.x >= 1100) {
-    player.body.x = 1100
+    player.body.x = 1100;
   }
 
   if (cursors.space.isDown) {
     if (bulletArr < 1)
       if (player.flipX == false) {
         bullet = bullets.create(player.body.x, player.body.y + 20, 'bullet', 64, 64);
-        bullet.body.setVelocity(1000, 0)
-        bulletArr.push(bullet)
-        bullet.body.gravity.y = -400
+        bullet.body.setVelocity(1000, 0);
+        bulletArr.push(bullet);
+        bullet.body.gravity.y = -400;
         bullet.setBounce(0.1); // our bullet will bounce from items
         bullet.setCollideWorldBounds(true); // don't go out of the map    
         // small fix to our bullet images, we resize the physics body object slightly
@@ -444,9 +446,9 @@ function update(time, delta) {
 
       } else if (player.flipX == true) {
       bullet = bullets.create(player.body.x, player.body.y + 20, 'bullet', 64, 64);
-      bullet.body.setVelocity(-1000, 0)
-      bulletArr.push(bullet)
-      bullet.body.gravity.y = -400
+      bullet.body.setVelocity(-1000, 0);
+      bulletArr.push(bullet);
+      bullet.body.gravity.y = -400;
       bullet.setBounce(0.1); // our bullet will bounce from items
       bullet.setCollideWorldBounds(true); // don't go out of the map    
       // small fix to our bullet images, we resize the physics body object slightly
@@ -456,7 +458,7 @@ function update(time, delta) {
     }
 
   
-    console.log(bulletArr)
+    console.log(bulletArr);
   }
   bulletArr.forEach((bullet, i) => {
 
@@ -467,7 +469,7 @@ function update(time, delta) {
     }
   });
   bulletArr.forEach((bullet, i) => {
-    console.log(bullet.body.position.x, i)
+    console.log(bullet.body.position.x, i);
     if (bullet.body.position.x < 10) {
       bulletArr.splice(i, 1);
       bullet.disableBody(true, true);
