@@ -20,28 +20,46 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
+
+//////////////////////////////////////////////////
+//GLOBAL VARIABLES
+
 let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime;
 let enemyArr = [];
 var score = 0;
 var health = 100;
 
+//////////////////////////////////////////////////
+
+
 function preload() {
     // map made with Tiled in JSON format
     this.load.tilemapTiledJSON('map', 'assets/officeMap.json');
-    // enemies in spritesheet 
-    this.load.spritesheet('enemyRight', 'assets/enemyright.png', {frameWidth: 32, frameHeight: 32});
-    this.load.spritesheet('enemyLeft', 'assets/enemyleft.png', {frameWidth: 32, frameHeight: 32});
+
+    // enemies spritesheet 
     this.load.atlas('enemy', 'assets/enemy.png', 'assets/player.json');
+
     // tiles for map
     this.load.image('terrainPNG', 'assets/Office_furniture_set.png');
+
     // player animations
     this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
-    this.load.image('shot', 'assets/bullet.png');
     
 }
 
 
 function create() {
+
+    ////////////////////////////////////////////////////////////////
+    //IMPORTANT VARIABLES AND PHYSICS
+
+    let gameOverText = this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', { fontSize: '40px', fill: '#fff',backgroundColor: '#000' });
+    gameOverText.setOrigin(0.5);
+    gameOverText.setDepth(1);
+    gameOverText.visible = false;
+    
+    cursors = this.input.keyboard.createCursorKeys();
+
 
     //Starting time
     startingTime = new Date().getTime();
@@ -50,18 +68,9 @@ function create() {
     map = this.make.tilemap({key: 'map'});
 
     // tiles for the ground layer
-    var office = map.addTilesetImage('test','terrainPNG');
-         map.createDynamicLayer('default2', office, 0, 0).setScale(2.9);
-            map.createStaticLayer('default', office, 0, 0).setScale(2.9);
-    // create the ground layer
-    // groundLayer = map.createDynamicLayer('World', groundTiles, 0, 0);
-    // the player will collide with this layer
-   
-
-    // coin image used as tileset
-    // var coinTiles = map.addTilesetImage('coin');
-    // add coins as tiles
-    // coinLayer = map.createDynamicLayer('Coins', coinTiles, 0, 0);
+    office = map.addTilesetImage('test','terrainPNG');
+    map.createDynamicLayer('default2', office, 0, 0).setScale(2.9);
+    map.createStaticLayer('default', office, 0, 0).setScale(2.9);
 
     // set the boundaries of our game world
     this.physics.world.bounds.width = 1150;
@@ -72,24 +81,20 @@ function create() {
     player.setBounce(0.1); // our player will bounce from items
     player.setCollideWorldBounds(true); // don't go out of the map    
     
-    // this.physics.player.world.bounds.width =  1000
     // small fix to our player images, we resize the physics body object slightly
     player.body.setSize(32, 45);
     player.setScale(2);
-    // player.body.setOrigin(0,0)
     // player will collide with the level tiles 
     this.physics.add.collider(map, player);
+    // set bounds so the camera won't go outside the game world
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    // make the camera follow the player
+    this.cameras.main.startFollow(player);
 
-    // coinLayer.setTileIndexCallback(17, collectCoin, this);
-    // when the player overlaps with a tile with index 17, collectCoin 
-    // will be called    
-    // this.physics.add.overlap(player, coinLayer);
+    //////////////////////////////////////////////////
 
-
-    //enemies
-    enemy = this.physics.add.group();
-   
-    //////////////////////////////////////////////////////////////////////////////////////////
+  
+    //////////////////////////////////////////////////
     //ANIMATIONS
 
 
@@ -100,22 +105,28 @@ function create() {
         frameRate: 10,
         repeat: -1
     });
-    // idle with only one frame, so repeat is not neaded
+    // player idle animation
     this.anims.create({
         key: 'idle',
         frames: [{key: 'player', frame: 'p1_stand'}],
         frameRate: 10,
     });
+    // player jumping animation
     this.anims.create({
         key: 'jump',
         frames: [{key: 'player', frame: 'p1_jump'}],
         frameRate: 10,
     });
+    //player dying animation
+    this.anims.create({
+        key: 'fall',
+        frames: this.anims.generateFrameNames('player', {prefix: 'p1_fall', start: 1, end: 6, zeroPad: 2}),
+        frameRate: 10,
+        repeat: -1
+    });
     
     
-    //enemy walking
-    
-
+    // enemy walking animation
     this.anims.create({
         key: 'walkEnemy',
         frames: this.anims.generateFrameNames('enemy', {prefix: 'p1_walk', start: 1, end: 9, zeroPad: 2}),
@@ -123,32 +134,11 @@ function create() {
         repeat: -1
     });
 
-    // this.anims.create({
-    //     key: 'left',
-    //     frames: this.anims.generateFrameNumbers('enemyLeft'),
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
-    // this.anims.create({
-    //     key: 'right',
-    //     frames: this.anims.generateFrameNumbers('enemyRight'),
-    //     frameRate: 1,
-    //     repeat: -1
-    // });
+    //////////////////////////////////////////////////
 
 
-    cursors = this.input.keyboard.createCursorKeys();
-
-    // set bounds so the camera won't go outside the game world
-    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-    // make the camera follow the player
-    this.cameras.main.startFollow(player);
-
-
-    ///////////////////////////////////////////////////////
+    //////////////////////////////////////////////////
     //SCORE
-
-    //timedEvent = this.time.delayedCall(3000, onEvent, [], this);
 
     scoreText = this.add.text(20, 60, 'Score: ', {
         fontSize: '35px',
@@ -162,9 +152,11 @@ function create() {
     });
     // fix the text to the camera
     text.setScrollFactor(0);
+
+    //////////////////////////////////////////////////
     
     
-    /////////////////////////////////////////////////////
+    //////////////////////////////////////////////////
     //HEALTH
 
     healthNumber = this.add.text(160, 20, health, {
@@ -182,16 +174,20 @@ function create() {
 
     healthNumber.setScrollFactor(0);
 
+    //////////////////////////////////////////////////
 
-    ///////////////////////////////////////////////////////////////////////
-    //Spawning enemies
-   let enemyArr = [];
+
+    //////////////////////////////////////////////////
+    //ENEMY SPAWNING
+
+    enemy = this.physics.add.group();
+
     setInterval(()=>{   
         if(enemyArr.length <= 3){ 
             var x = Phaser.Math.Between(400, 800);
             enemy = this.physics.add.sprite(x, 200, 'enemy');
             enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
-        }    
+        }
             this.physics.world.bounds.width = office.width;
             this.physics.world.bounds.height = 600;
     
@@ -200,60 +196,42 @@ function create() {
             enemy.setBounce(0.6);
             enemy.setCollideWorldBounds(true);
             
-            // enemy.setVelocity(Phaser.Math.Between(-400, 400), 100);
             enemy.allowGravity = true;
             enemyArr.push(enemy);
             this.physics.add.collider(player, enemy, damage, null, this);
 
             enemyArr.forEach((enem,i)=>{
+
                 if(enem.body.position.x > 1150){
                     enemyArr.splice(i,1);
                     enem.disableBody(true,true);
-                }
 
-            });
-            console.log(enemyArr.length);
-        //}
-        
+                }
+            });       
          
     }, 1000);
     
-    
-
     this.physics.add.collider(player, enemy, damage, null, this);
 
+    //////////////////////////////////////////////////
 
-    //////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////
     //SHOOTING
 
     //lol nvm
+
+    //////////////////////////////////////////////////    
  
 }
 
-// function resetshot(shot) {
-// 	// Destroy the shot
-// 	shot.kill();
-// }
-
-
-////////////////////////////////////////////
-
-
-// // this function will be called when the player touches a coin
-// function collectCoin(sprite, tile) {
-//     coinLayer.removeTileAt(tile.x, tile.y); // remove the tile/coin
-//     score++; // add 10 points to the score
-//     text.setText(score); // set the text to show the current score
-//     return false;
-// }
-
+function addScore(){
+    const startTime = new Date();
+    console.log(startTime.getTime());
+}
 
 function damage(){
     player.y -= 10;
-
-    if(health <= 0) {
-        //this.physics.pause();
-    }
 
     player.setTint(0xff0000);
     setTimeout(()=>{
@@ -269,99 +247,78 @@ function damage(){
 //////////////////////////////////////////////////
 //SHOOTING
  
-// function touchDown() {
-// 	// Set touchDown to true, so we only trigger this once
-// 	mouseTouchDown = true;
-// 	fireshot();
-// }
- 
-// function touchUp() {
-// 	// Set touchDown to false, so we can trigger touchDown on the next click
-// 	mouseTouchDown = false;
-// }
- 
-// function fireshot() {
-// 	// Get the first shot that's inactive, by passing 'false' as a parameter
-// 	var shot = shots.getFirstExists(false);
-// 	if (shot) {
-// 		// If we have a shot, set it to the starting position
-// 		shot.reset(ship.x, ship.y - 20);
-// 		// Give it a velocity of -500 so it starts shooting
-// 		shot.body.velocity.y = -500;
-// 	}
-// }
 
-function addScore(){
-    const startTime = new Date();
-    console.log(startTime.getTime());
-}
+/////////////////////////////////////////////////
+
+
+
 
 
 function update(time, delta) {
 
-///////////////////////////////////////////////////
-//SCORE
+    //////////////////////////////////////////////////
+    //SCORE
 
-currentTime = new Date().getTime();
-score += Math.floor(Math.floor((currentTime - startingTime)) / 2000);
+    currentTime = new Date().getTime();
+    score += Math.floor(Math.floor((currentTime - startingTime)) / 2000);
 
-text = this.add.text(140, 60, score, {
-    fontSize: '35px',
-    fill: '#fff',
-    backgroundColor: '#000'
-});
-///////////////////////////////////////////////////
-//SHOOTING
+    text = this.add.text(140, 60, score, {
+        fontSize: '35px',
+        fill: '#fff',
+        backgroundColor: '#000'
+    });
 
-
-	// Game.input.activePointer is either the first finger touched, or the mouse
-	// if (game.input.activePointer.isDown) {
-	// 	// We'll manually keep track if the pointer wasn't already down
-	// 	if (!pointer.isDown) {
-	// 		touchDown();
-	// 	}
-	// } else {
-	// 	if (pointer.isDown) {
-	// 		touchUp();
-	// 	}
-    // }
-     
-
-if(health > 70){
-    healthNumber.setFill('#0f0');
-}
-
-if(health > 30 && health <= 70){
-    healthNumber.setFill('#ff0');
-}
-
-if(health <= 30){
-    healthNumber.setFill('#f00');
-}
-if(health < 0){
-    this.gameOver();
-}
+    //////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////
-//ENEMY SPRITE CHANGE
+    //////////////////////////////////////////////////
+    //HEALTH NUMBER AND GAME OVER
 
-enemyArr.forEach(i => {
-    if(i.body.velocity.x < 0){
-        i.anims.play('walkEnemy', true); // walk left
-        i.flipX = true;
+    if(health > 70){
+        healthNumber.setFill('#0f0');
     }
-    else if(i.body.velocity.x > 0){
-        i.anims.play('walkEnemy', true);
-        i.flipX = false;
-    }
-    else {
-        console.log('no');
-    }
-});
 
-////////////////////////////////////////////////
-//MOVEMENT AND JUMPING
+    if(health > 30 && health <= 70){
+        healthNumber.setFill('#ff0');
+    }
+
+    if(health <= 30){
+        healthNumber.setFill('#f00');
+    }
+    if(health < 0){
+        //gameOverText.visible = true;
+        player.anims.play('fall', true);
+        setTimeout(() => {
+            this.gameOver();
+        }, 500);
+        
+    }
+
+    //////////////////////////////////////////////////
+
+
+    //////////////////////////////////////////////////
+    //ENEMY SPRITE ANIMATION
+
+    enemyArr.forEach(i => {
+        if(i.body.velocity.x < 0){
+            i.anims.play('walkEnemy', true); // walk left
+            i.flipX = true;
+        }
+        else if(i.body.velocity.x > 0){
+            i.anims.play('walkEnemy', true);
+            i.flipX = false;
+        }
+        else {
+            console.log('no');
+        }
+    });
+
+    //////////////////////////////////////////////////
+
+
+    //////////////////////////////////////////////////
+    //PLAYER MOVEMENT AND JUMPING
 
     if (cursors.left.isDown)
     {
@@ -373,19 +330,13 @@ enemyArr.forEach(i => {
     {
         player.body.setVelocityX(200);
         player.anims.play('walk', true);
-       if (player.body.x >= 1100) {
-        //    player.setPosition(1100, player.body.y)
-           player.body.setVelocity(0);
-        //    player.flipX = true; 
-           //cursors.right.isDown = false
-
-        }
         player.flipX = false; // use the original sprite looking to the right
     }
     else if (player.body.onFloor()) {
         player.body.setVelocityX(0);
         player.anims.play('idle', true);
     }
+
     // jump 
     if (cursors.up.isDown && player.body.onFloor())
     {
@@ -396,4 +347,6 @@ enemyArr.forEach(i => {
     {
         player.anims.play('jump', true);
     }
+
+    //////////////////////////////////////////////////
 }
