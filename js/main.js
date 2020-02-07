@@ -7,7 +7,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: {y: 500},
-            debug: false
+            debug: true
         }
     },
     
@@ -24,7 +24,7 @@ var game = new Phaser.Game(config);
 //////////////////////////////////////////////////
 //GLOBAL VARIABLES
 
-let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime, hurt, jump, wKey, sKey, aKey, dKey;
+let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime, hurt, jump, wKey, sKey, aKey, dKey, bullets;
 let enemyArr = [];
 var score = 0;
 var health = 100;
@@ -45,12 +45,12 @@ function preload() {
 
     // player animations
     this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
-    
+    this.load.image('bullet', 'assets/bullet.png');
     // SOUNDS
     // player hurt sound
-    this.load.audio('hurtSnd', '../assets/sound effects/Player_hurt.ogg');
-    this.load.audio('jumpSnd', '../assets/sound effects/Player_jump.ogg');
-    this.load.audio('musicSnd', '../assets/sound effects/soundtrack.mp3');
+    this.load.audio('hurtSnd', 'assets/sound effects/Player_hurt.ogg');
+    this.load.audio('jumpSnd', 'assets/sound effects/Player_jump.ogg');
+    this.load.audio('musicSnd', 'assets/sound effects/soundtrack.mp3');
 }
 
 
@@ -85,7 +85,7 @@ function create() {
         delay: 0
     });
 
-    music.play();
+    // music.play();
 
     //Starting time
     startingTime = new Date().getTime();
@@ -106,16 +106,20 @@ function create() {
     player = this.physics.add.sprite(200, 400, 'player', 64, 64);
     player.setBounce(0.1); // our player will bounce from items
     player.setCollideWorldBounds(true); // don't go out of the map    
-    
-    // small fix to our player images, we resize the physics body object slightly
+     // small fix to our player images, we resize the physics body object slightly
     player.body.setSize(32, 45);
     player.setScale(2);
+    player.body.immovable = true;
     // player will collide with the level tiles 
     this.physics.add.collider(map, player);
     // set bounds so the camera won't go outside the game world
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     // make the camera follow the player
     this.cameras.main.startFollow(player);
+
+    //bullet group
+    bullets = this.physics.add.group();
+
 
     //////////////////////////////////////////////////
 
@@ -245,7 +249,7 @@ function create() {
 
     //////////////////////////////////////////////////
     //SHOOTING
-
+    
     //lol nvm
 
     //////////////////////////////////////////////////    
@@ -256,6 +260,7 @@ function addScore(){
     const startTime = new Date();
     console.log(startTime.getTime());
 }
+
 
 function damage(){
     player.y -= 10;
@@ -312,24 +317,24 @@ function update(time, delta) {
     if(health <= 30){
         healthNumber.setFill('#f00');
     }
-    if(health < -1){
-        //gameOverText.visible = true;
-        // player.anims.play('fall', true);
-        // setTimeout(() => {
-        //     
-        // }, 500);
-        if(confirm(`THE OFFICE WAS TAKEN OVER \n \n Your score was ${score} \n \n Click ok to restart`)){
-            location.reload();
-        }else{
-            if(confirm(`Just click ok please`)){
-                location.reload();
-            }
-        }
+    // if(health < -1){
+    //     //gameOverText.visible = true;
+    //     // player.anims.play('fall', true);
+    //     // setTimeout(() => {
+    //     //     
+    //     // }, 500);
+    //     if(confirm(`THE OFFICE WAS TAKEN OVER \n \n Your score was ${score} \n \n Click ok to restart`)){
+    //         location.reload();
+    //     }else{
+    //         if(confirm(`Just click ok please`)){
+    //             location.reload();
+    //         }
+    //     }
         
-        setTimeout(() => {
-            this.gameOver();
-        }, 2000);
-    }
+    //     setTimeout(() => {
+    //         this.gameOver();
+    //     }, 2000);
+    // }
 
     //////////////////////////////////////////////////
 
@@ -396,6 +401,28 @@ function update(time, delta) {
     else if (!player.body.onFloor() && player.y < 500){
         player.anims.play('jump', true);
     }
-
+    if(player.body.x >= 1100){
+      player.body.x = 1100;
+    }
+    if(player.body.x >=1100){
+      player.body.x = 1100;
+    }
+    if(cursors.space.isDown){
+     
+      if(player.flipX == false){
+        bullet = bullets.create(player.body.x, player.body.y + 20, 'bullet', 64, 64);
+        bullet.body.setVelocity(1000,0);
+        
+        bullet.body.gravity.y = -400;
+        bullet.setBounce(0.1); // our bullet will bounce from items
+        bullet.setCollideWorldBounds(true); // don't go out of the map    
+         // small fix to our bullet images, we resize the physics body object slightly
+        bullet.body.setSize(32, 45);
+        bullet.setScale(0.03);
+        console.log(bullet);
+        console.log('yesesesesese');
+      }
+    }
+   
     //////////////////////////////////////////////////
 }
