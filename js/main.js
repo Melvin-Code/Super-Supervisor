@@ -361,6 +361,9 @@ function update(time, delta) {
         player.body.setVelocityX(200);
         player.anims.play('walk', true);
         player.flipX = false; // use the original sprite looking to the right
+        if(player.body.x > 1100) {
+          player.body.setVelocity(0)
+        }
     }
     // if (cursors.left.isDown){
     //     player.body.setVelocityX(-200);
