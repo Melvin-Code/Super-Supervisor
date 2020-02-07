@@ -50,6 +50,7 @@ function preload() {
     // player hurt sound
     this.load.audio('hurtSnd', '../assets/sound effects/Player_hurt.ogg');
     this.load.audio('jumpSnd', '../assets/sound effects/Player_jump.ogg');
+    this.load.audio('musicSnd', '../assets/sound effects/soundtrack.mp3');
 }
 
 
@@ -69,6 +70,18 @@ function create() {
     hurt = this.sound.add('hurtSnd');
     jump = this.sound.add('jumpSnd');
 
+    music = this.sound.add('musicSnd', {
+        mute: false,
+        volume: 1,
+        rate: 1,
+        detune: 0,
+        seek: 0,
+        loop: true,
+        delay: 0
+    });
+
+    music.play();
+
     //Starting time
     startingTime = new Date().getTime();
 
@@ -85,7 +98,7 @@ function create() {
     this.physics.world.bounds.height = 600 ;
     
     // create the player sprite    
-    player = this.physics.add.sprite(200, 200, 'player', 64, 64);
+    player = this.physics.add.sprite(200, 400, 'player', 64, 64);
     player.setBounce(0.1); // our player will bounce from items
     player.setCollideWorldBounds(true); // don't go out of the map    
     
@@ -189,7 +202,7 @@ function create() {
     //ENEMY SPAWNING
 
     enemy = this.physics.add.group();
-
+    
     setInterval(()=>{   
         if(enemyArr.length <= 3){ 
             var x = Phaser.Math.Between(800, 1000);
