@@ -24,7 +24,7 @@ var game = new Phaser.Game(config);
 //////////////////////////////////////////////////
 //GLOBAL VARIABLES
 
-let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime;
+let map, player, cursors, enemies, office, coinLayer, text, startingTime, currentTime, hurt, jump;
 let enemyArr = [];
 var score = 0;
 var health = 100;
@@ -33,6 +33,7 @@ var health = 100;
 
 
 function preload() {
+    //IMAGES
     // map made with Tiled in JSON format
     this.load.tilemapTiledJSON('map', 'assets/officeMap.json');
 
@@ -45,6 +46,10 @@ function preload() {
     // player animations
     this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
     
+    // SOUNDS
+    // player hurt sound
+    this.load.audio('hurtSnd', '../assets/sound effects/Player_hurt.ogg');
+    this.load.audio('jumpSnd', '../assets/sound effects/Player_jump.ogg');
 }
 
 
@@ -60,6 +65,9 @@ function create() {
     
     cursors = this.input.keyboard.createCursorKeys();
 
+    //sounds
+    hurt = this.sound.add('hurtSnd');
+    jump = this.sound.add('jumpSnd');
 
     //Starting time
     startingTime = new Date().getTime();
@@ -233,7 +241,7 @@ function addScore(){
 
 function damage(){
     player.y -= 10;
-
+    hurt.play();
     player.setTint(0xff0000);
     setTimeout(()=>{
         player.setTint();
@@ -341,6 +349,7 @@ function update(time, delta) {
     // jump 
     if (cursors.up.isDown && player.body.onFloor())
     {
+        jump.play();
         player.anims.play('jump', true);
         player.body.setVelocityY(-520);        
     }
