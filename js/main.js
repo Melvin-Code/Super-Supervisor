@@ -26,11 +26,12 @@ var game = new Phaser.Game(config);
 //////////////////////////////////////////////////
 //GLOBAL VARIABLES
 
-let map, player, bullets, cursors, enemies, office, coinLayer, text, startingTime, currentTime, hurt, jump, wKey, sKey, aKey, dKey;
+let map, player, bullets, cursors, enemies, office, coinLayer, text, startingTime, currentTime, hurt, jump;
 let enemyArr = [];
 let bulletArr = [];
 var score = 0;
 var health = 100;
+var counter = 1
 
 //////////////////////////////////////////////////
 
@@ -48,7 +49,7 @@ function preload() {
 
   // player animations
   this.load.atlas('player', 'assets/player1.png', 'assets/player.json');
-  this.load.image('bullet', 'assets/bullet.png');;;;;;;;;;;;;;
+  this.load.image('bullet', 'assets/bullet.png')
   // SOUNDS
   // player hurt sound
   this.load.audio('hurtSnd', 'assets/sound effects/Player_hurt.ogg');
@@ -72,11 +73,6 @@ function create() {
   gameOverText.visible = false;
 
   cursors = this.input.keyboard.createCursorKeys();
-
-  wKey = this.input.keyboard.addKey('W');
-  sKey = this.input.keyboard.addKey('S');
-  aKey = this.input.keyboard.addKey('A');
-  dKey = this.input.keyboard.addKey('D');
 
   //sounds
   hurt = this.sound.add('hurtSnd');
@@ -118,7 +114,7 @@ function create() {
   // small fix to our player images, we resize the physics body object slightly
   player.body.setSize(32, 45);
   player.setScale(2);
-  player.body.immovable = true;
+  player.body.immovable = true
   // player will collide with the level tiles 
   this.physics.add.collider(map, player);
   // set bounds so the camera won't go outside the game world
@@ -127,7 +123,7 @@ function create() {
   this.cameras.main.startFollow(player);
 
   //bullet group
-  bullets = this.physics.add.group();
+  bullets = this.physics.add.group()
 
 
   //////////////////////////////////////////////////
@@ -166,16 +162,6 @@ function create() {
       frame: 'p1_jump'
     }],
     frameRate: 10,
-  });
-  // player shooting animation
-  this.anims.create({
-    key: 'shoot',
-    frames: [{
-      key: 'player',
-      frame: 'p1_shoot'
-    }],
-    frameRate: 10,
-
   });
   //player dying animation
   this.anims.create({
@@ -283,6 +269,7 @@ function create() {
   }, 1000);
 
   this.physics.add.collider(player, enemy, damage, null, this);
+  
 
   //////////////////////////////////////////////////
 
@@ -299,10 +286,36 @@ function create() {
 function addScore() {
   const startTime = new Date();
   console.log(startTime.getTime());
-  
+  l
 }
 
+function bulletShot() {
+  enemy.y -= 10;
+  hurt.play();
+  enemy.setTint(0xff0000);
+  setTimeout(() => {
+    enemy.setTint();
+  }, 100);
+  enemyArr.forEach((enemy, i) => {
 
+      if (enemy ) {
+        enemyArr.splice(i, 1);
+        enemy.disableBody(true, true);
+
+      }
+    });
+
+  bulletArr.forEach((bullet, i) => {
+    // console.log(bullet.body.position.x, i)
+    
+      bulletArr.splice(i, 1);
+      bullet.disableBody(true, true);
+
+    
+  });
+
+ 
+}
 function damage() {
   player.y -= 10;
   hurt.play();
@@ -331,7 +344,8 @@ function update(time, delta) {
 
   //////////////////////////////////////////////////
   //SCORE
-
+// counter = counter + 1
+// console.log(counter)
   currentTime = new Date().getTime();
   score += Math.floor(Math.floor((currentTime - startingTime)) / 2000);
   score = Math.floor(score / 1.2);
@@ -358,8 +372,6 @@ function update(time, delta) {
   if (health <= 30) {
     healthNumber.setFill('#f00');
   }
-
-  //****************************************************************/
   // if(health < -1){
   //     //gameOverText.visible = true;
   //     // player.anims.play('fall', true);
@@ -378,7 +390,7 @@ function update(time, delta) {
   //         this.gameOver();
   //     }, 2000);
   // }
-  //*****************************************************************/
+
   //////////////////////////////////////////////////
 
 
@@ -403,41 +415,36 @@ function update(time, delta) {
   //////////////////////////////////////////////////
   //PLAYER MOVEMENT AND JUMPING
 
-  if (cursors.left.isDown || aKey.isDown) {
+  if (cursors.left.isDown) {
     player.body.setVelocityX(-200);
     player.anims.play('walk', true); // walk left
     player.flipX = true; // flip the sprite to the left
-  }
-  else if (cursors.right.isDown || dKey.isDown) {
+  } else if (cursors.right.isDown) {
     player.body.setVelocityX(200);
     player.anims.play('walk', true);
     player.flipX = false; // use the original sprite looking to the right
     if (player.body.x > 1100) {
-      player.body.setVelocity(0);
+      player.body.setVelocity(0)
 
     }
   }
-
-  //player running
-  else if (cursors.left.isDown || aKey.isDown && cursors.shift.isDown){
-      player.body.setVelocityX(-200);
-      player.anims.play('walk', true); // walk left
-      player.flipX = true; // flip the sprite to the left
-  }
-  else if (cursors.right.isDown || dKey.isDown && cursors.shift.isDown){
-      player.body.setVelocityX(200);
-      player.anims.play('walk', true);
-      player.flipX = false; // use the original sprite looking to the right
-  }
-
-  //player idle
+  // if (cursors.left.isDown){
+  //     player.body.setVelocityX(-200);
+  //     player.anims.play('walk', true); // walk left
+  //     player.flipX = true; // flip the sprite to the left
+  // }
+  // else if (cursors.right.isDown){
+  //     player.body.setVelocityX(200);
+  //     player.anims.play('walk', true);
+  //     player.flipX = false; // use the original sprite looking to the right
+  // }
   else if (player.body.onFloor()) {
     player.body.setVelocityX(0);
     player.anims.play('idle', true);
   }
 
   // jump 
-  if (cursors.up.isDown || wKey.isDown && player.body.onFloor()) {
+  if (cursors.up.isDown && player.body.onFloor()) {
     jump.play();
     player.anims.play('jump', true);
     player.body.setVelocityY(-500);
@@ -445,20 +452,25 @@ function update(time, delta) {
     player.anims.play('jump', true);
   }
   if (player.body.x >= 1100) {
-    player.body.x = 1100;
+    player.body.x = 1100
   }
   if (player.body.x >= 1100) {
-    player.body.x = 1100;
+    player.body.x = 1100
   }
-
+setInterval(() => {
+if(counter < 2000){
+  counter = counter +1
+}
+}, 1000)
   if (cursors.space.isDown) {
-    player.anims.play('shoot', true);
-    if (bulletArr < 1) {
+    if (bulletArr < 1 && counter >= 180){
+      
       if (player.flipX == false) {
         bullet = bullets.create(player.body.x, player.body.y + 20, 'bullet', 64, 64);
-        bullet.body.setVelocity(1000, 0);
-        bulletArr.push(bullet);
-        bullet.body.gravity.y = -400;
+       
+        bullet.body.setVelocity(1000, 0)
+        bulletArr.push(bullet)
+        bullet.body.gravity.y = -400
         bullet.setBounce(0.1); // our bullet will bounce from items
         bullet.setCollideWorldBounds(true); // don't go out of the map    
         // small fix to our bullet images, we resize the physics body object slightly
@@ -467,20 +479,28 @@ function update(time, delta) {
 
       } else if (player.flipX == true) {
       bullet = bullets.create(player.body.x, player.body.y + 20, 'bullet', 64, 64);
-      bullet.body.setVelocity(-1000, 0);
-      bulletArr.push(bullet);
-      bullet.body.gravity.y = -400;
+      bullet.body.setVelocity(-1000, 0)
+      bulletArr.push(bullet)
+      bullet.body.gravity.y = -400
       bullet.setBounce(0.1); // our bullet will bounce from items
       bullet.setCollideWorldBounds(true); // don't go out of the map    
       // small fix to our bullet images, we resize the physics body object slightly
       bullet.body.setSize(32, 45);
       bullet.setScale(0.03);
-
+      
     }
-
-  
-    console.log(bulletArr);
+    console.log(bullet.body.velocity)
+          
   }
+  this.physics.add.collider(bulletArr, enemy, bulletShot, null, this);
+  }
+  if (counter >= 190 && cursors.space.isDown){
+    counter = counter -500
+    console.log('yo')
+   }else if (counter >= 180){
+     counter = 180
+   }
+  console.log(counter)
   bulletArr.forEach((bullet, i) => {
 
     if (bullet.body.position.x > 1150) {
@@ -490,14 +510,13 @@ function update(time, delta) {
     }
   });
   bulletArr.forEach((bullet, i) => {
-    console.log(bullet.body.position.x, i);
+    // console.log(bullet.body.position.x, i)
     if (bullet.body.position.x < 10) {
       bulletArr.splice(i, 1);
       bullet.disableBody(true, true);
 
     }
   });
-
+  
   //////////////////////////////////////////////////
-}
 }
