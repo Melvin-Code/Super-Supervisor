@@ -13,11 +13,11 @@ export default new Phaser.Class({
     },
     preload: function() {
         this.load.bitmapFont('Click-Pixel', 'assets/fonts/click.png', 'assets/fonts/click.xml');
-        this.load.audio('menuMusic', '../assets/sound effects/menuMusic.mp3');
-        this.load.image('fired', '../assets/fired.png');
+        this.load.audio('menuMusic', './assets/sound effects/menuMusic.mp3');
+        this.load.image('fired', './assets/fired.png');
         this.load.audio("sndBtnOver", "./assets/sound effects/sndBtnOver.wav");
         this.load.audio("sndBtnDown", "./assets/sound effects/sndBtnDown.wav");
-        this.load.atlas('player', '../assets/player1.png', '../assets/player.json');
+        this.load.atlas('player', './assets/player1.png', './assets/player.json');
     },
   
     create() {

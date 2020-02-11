@@ -22,22 +22,22 @@ export default new Phaser.Class({
     preload() {
         //IMAGES
         // map made with Tiled in JSON format
-        this.load.tilemapTiledJSON('map', '../assets/officeMap.json');
+        this.load.tilemapTiledJSON('map', './assets/officeMap.json');
 
         // enemies spritesheet 
-        this.load.atlas('enemy', '../assets/enemy.png', '../assets/player.json');
+        this.load.atlas('enemy', './assets/enemy.png', './assets/player.json');
 
         // tiles for map
-        this.load.image('terrainPNG', '../assets/Office_furniture_set.png');
+        this.load.image('terrainPNG', './assets/Office_furniture_set.png');
 
         // player animations
-        this.load.atlas('player', '../assets/player1.png', '../assets/player.json');
-        this.load.image('bullet', '../assets/bullet.png');
+        this.load.atlas('player', './assets/player1.png', './assets/player.json');
+        this.load.image('bullet', './assets/bullet.png');
         // SOUNDS
         // player hurt sound
-        this.load.audio('hurtSnd', '../assets/sound effects/Player_hurt.ogg');
-        this.load.audio('jumpSnd', '../assets/sound effects/Player_jump.ogg');
-        this.load.audio('musicSnd', '../assets/sound effects/soundtrack.mp3');
+        this.load.audio('hurtSnd', './assets/sound effects/Player_hurt.ogg');
+        this.load.audio('jumpSnd', './assets/sound effects/Player_jump.ogg');
+        this.load.audio('musicSnd', './assets/sound effects/soundtrack.mp3');
 
         // loading bar
 
