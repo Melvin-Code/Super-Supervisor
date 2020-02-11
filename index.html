@@ -5,8 +5,17 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
         
-        <script type="text/javascript" src="js/phaser.js"></script>
-        <script type="text/javascript" src="js/main.js"></script>
+        <!-- Libraries -->
+        <script src="./libs/phaser.js"></script>
+       
+        <!-- Scenes and Global Variables -->
+        <script type="module" src="./js/globals.js"></script>
+        <script type="module" src="./js/game.js"></script>
+        <script type="module" src="./js/menu.js"></script>
+        <script type="module" src="./js/playEasy.js"></script>
+        <script type="module" src="./js/playNormal.js"></script>
+        <script type="module" src="./js/playHard.js"></script>
+
         
         <style>
             body {
@@ -15,7 +24,7 @@
             }
         </style>
     </head>
-    <body style="display:flex;justify-content:center;align-items:center;margin: 7rem;">    
-
+    <body style="background-color:black; display:flex;justify-content:center;align-items:center;margin: 7rem;">    
+        <div id="phaser-app"></div>
     </body>
 </html>
