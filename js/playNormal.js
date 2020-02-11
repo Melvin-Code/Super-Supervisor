@@ -74,7 +74,7 @@ export default new Phaser.Class({
             volume: 0.75,
             rate: 1,
             detune: 0,
-            seek: 0,
+            // seek: 0,
             loop: true,
             delay: 0
         });
